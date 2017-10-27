@@ -4,7 +4,14 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { HomePage } from '../pages/home/home';
-import { ListPage } from '../pages/list/list';
+import { ProximoPage } from '../pages/proximo/proximo';
+import { PuntoPage } from '../pages/punto/punto';
+import { MapaPage } from '../pages/mapa/mapa';
+import { PromocionPage } from '../pages/promocion/promocion';
+import { FaqPage } from '../pages/faq/faq';
+import { ContactoPage } from '../pages/contacto/contacto';
+import { PerfilPage } from '../pages/perfil/perfil';
+
 
 @Component({
   templateUrl: 'app.html'
@@ -21,8 +28,15 @@ export class MyApp {
 
     // used for an example of ngFor and navigation
     this.pages = [
-      { title: 'Home', component: HomePage },
-      { title: 'List', component: ListPage }
+      { title: 'Mis eventos', component: HomePage },
+      { title: 'Proximos Tours', component: ProximoPage },
+      { title: 'Punto de Encuentro', component: PuntoPage },
+      { title: 'Mapas', component: MapaPage },
+      { title: 'Promociones', component: PromocionPage },
+      { title: 'Preguntas F.A.Q.', component: FaqPage },
+      { title: 'Contactenos', component: ContactoPage },
+      { title: 'Mi perfil', component: PerfilPage }
+
     ];
 
   }
