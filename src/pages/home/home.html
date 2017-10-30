@@ -1,9 +1,9 @@
 <ion-header>
-  <ion-navbar>
+  <ion-navbar color="primary">
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Eventos</ion-title>
+    <ion-title>Mis Eventos</ion-title>
     <ion-buttons end>
       <button ion-button icon-only (click)="addEvent()">
         <ion-icon name="add"></ion-icon>
@@ -14,10 +14,13 @@
 
 <ion-content padding>
 
-  <calendar [eventSource]="eventSource"
+  <calendar [eventSource]="calendar.eventSource"
         [calendarMode]="calendar.mode"
         [currentDate]="calendar.currentDate"
         [locale]="calendar.locale"
+        [formatDayHeader]="calendar.formatDayHeader"
+        [formatMonthTitle]="calendar.formatMonthTitle"
+        [noEventsLabel]="calendar.noEventsLabel" 
         (onCurrentDateChanged)="onCurrentDateChanged($event)"
         (onRangeChanged)="reloadSource(startTime, endTime)"
         (onEventSelected)="onEventSelected($event)"
@@ -25,5 +28,7 @@
         (onTimeSelected)="onTimeSelected($event)"
         step="30">
       </calendar>
+
+      <div>{{mensaje}}</div>
 
 </ion-content>

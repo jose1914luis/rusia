@@ -1,0 +1,56 @@
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+import { Component } from '@angular/core';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import * as moment from 'moment';
+/**
+ * Generated class for the ProximoPage page.
+ *
+ * See https://ionicframework.com/docs/components/#navigation for more info on
+ * Ionic pages and navigation.
+ */
+var ProximoPage = /** @class */ (function () {
+    function ProximoPage(navCtrl, navParams, alertCtrl) {
+        this.navCtrl = navCtrl;
+        this.navParams = navParams;
+        this.alertCtrl = alertCtrl;
+        this.eventSource = [];
+        this.calendar = {
+            mode: 'month',
+            currentDate: new Date()
+        };
+        //proxy = '/api';
+        this.proxy = 'http://moscutourgratis.com:8069';
+    }
+    ProximoPage.prototype.ionViewDidLoad = function () {
+        //console.log('ionViewDidLoad ProximoPage');
+    };
+    ProximoPage.prototype.onEventSelected = function (evt) {
+        var start = moment(evt.startTime).format('LLLL');
+        var end = moment(evt.endTime).format('LLLL');
+        var alert = this.alertCtrl.create({
+            title: '' + evt.title,
+            subTitle: 'From: ' + start + '<br>To: ' + end,
+            buttons: ['OK']
+        });
+        alert.present();
+    };
+    ProximoPage = __decorate([
+        IonicPage(),
+        Component({
+            selector: 'page-proximo',
+            templateUrl: 'proximo.html',
+        }),
+        __metadata("design:paramtypes", [NavController, NavParams, AlertController])
+    ], ProximoPage);
+    return ProximoPage;
+}());
+export { ProximoPage };
+//# sourceMappingURL=proximo.js.map

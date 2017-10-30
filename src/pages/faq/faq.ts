@@ -2,13 +2,9 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import  * as Odoo from 'odoo-xmlrpc';
 import { CONEXION } from '../../providers/constants/constants';
+import { Storage } from '@ionic/storage';
 
-/**
- * Generated class for the FaqPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+
 
 @IonicPage()
 @Component({
@@ -21,41 +17,49 @@ export class FaqPage {
   items = [];
   cargar = true;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private storage: Storage) {
+    
     var self = this;
-  	this.odoo.connect(function (err) {
-	    if (err) { 
+    self.items  = [];
+    this.storage.get('tours.clientes.faq').then((val) => {
 
-	    	return self.presentAlert('Falla!', 
-	    		'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
-	    }	    
-	    var inParams = [];
-    	inParams.push([['id', '<>', '0']]);    	
-    	var params = [];
-    	params.push(inParams);
+      if(val == null){
+      	this.odoo.connect(function (err) {
+    	    if (err) { 
 
-        self.odoo.execute_kw('tours.clientes.faq', 'search', params, function (err2, value2) {
+    	    	return self.presentAlert('Falla!', 
+    	    		'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
+    	    }	    
+    	    var inParams = [];
+        	inParams.push([['id', '<>', '0']]);    	
+          inParams.push(['id', 'response', 'name']); //fields
+        	var params = [];
+        	params.push(inParams);
 
-            if (err2) {
+            self.odoo.execute_kw('tours.clientes.faq', 'search_read', params, function (err2, value) {
 
-            	return self.presentAlert('Falla!', 
-            		'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
-            }                        
-            var inParams2 = [];
-	        inParams2.push(value2); //ids
-	        var params = [];
-	        params.push(inParams2);
-	        self.odoo.execute_kw('tours.clientes.faq', 'read', params, function (err3, value3) {
-	            if (err2) { return console.log(err3); }
-	            self.cargar = false;
-	            for (var key in value3) {
-      				(value3[key]).icon = 'arrow-dropdown-circle';
-      				(value3[key]).visible = false;
-            		self.items.push((value3[key]));	 	            		 
-            	}
-	        });	
-        });
-	  });
+              if (err2) {
+
+              	return self.presentAlert('Falla!', 
+              		'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
+              }                        
+              for (var key in value) {
+                (value[key]).icon = 'arrow-dropdown-circle';
+                (value[key]).visible = false;
+                self.items.push((value[key]));                      
+              }
+              self.cargar = false;                  
+              self.storage.set('tours.clientes.faq', value);
+            });
+    	  });
+      }else{
+
+        for (var key in val) {
+          self.items.push((val[key]));
+        }
+        self.cargar = false;
+      }      
+    });   
   }
 
   presentAlert(titulo, texto) {

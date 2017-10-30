@@ -6,11 +6,17 @@
 -->
 <ion-header>
 
-  <ion-navbar>
+  <ion-navbar color="primary">
   	<button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Proximos Tours</ion-title>
+    <ion-title>Proximos Tours</ion-title>  
+    <ion-buttons end>
+      <button ion-button [disabled]="isToday" (click)="today()">Hoy</button>
+      <button ion-button (click)="changeMode('month')">M</button>
+      <button ion-button (click)="changeMode('week')">S</button>
+      <button ion-button (click)="changeMode('day')">D</button>
+    </ion-buttons>
   </ion-navbar>
 
 </ion-header>
@@ -18,11 +24,25 @@
 
 <ion-content padding>
 
-	 <calendar [eventSource]="eventSource"
+  <div *ngIf="cargar" style="text-align: center">
+    <ion-spinner icon="lines"></ion-spinner>
+  </div>
+  
+  <h2>{{viewTitle}}</h2>
+	<calendar
+        [formatWeekTitle]="calendar.formatWeekTitle"
+        [allDayLabel]="calendar.allDayLabel"
+        [eventSource]="calendar.eventSource"
         [calendarMode]="calendar.mode"
-        [currentDate]="calendar.currentDate"        
+        [locale]="calendar.locale"
+        [currentDate]="calendar.currentDate"   
+        [formatDayHeader]="calendar.formatDayHeader"            
+        [formatMonthTitle]="calendar.formatMonthTitle"
+        [noEventsLabel]="calendar.noEventsLabel"          
         (onEventSelected)="onEventSelected($event)"
+        (onTitleChanged)="onViewTitleChanged($event)"
         step="30">
-      </calendar>
+  </calendar>  
+  <div>{{mensaje}}</div>
 
 </ion-content>

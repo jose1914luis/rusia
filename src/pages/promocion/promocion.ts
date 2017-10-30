@@ -4,6 +4,7 @@ import  * as Odoo from 'odoo-xmlrpc';
 import { CONEXION } from '../../providers/constants/constants';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { PromoDetailPage } from '../../pages/promo-detail/promo-detail';
+import { Storage } from '@ionic/storage';
 
 /**
  * Generated class for the PromocionPage page.
@@ -24,41 +25,48 @@ export class PromocionPage {
   items = [];
   cargar = true;
   //promocion = {city:'', numero:0, items:[]};
-  constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
     var self = this;
-  	this.odoo.connect(function (err) {
-	    if (err) { 
+    self.items  = [];
+    this.storage.get('tours.promociones').then((val) => {
+      if(val == null){
+      	this.odoo.connect(function (err) {
+    	    if (err) { 
 
-	    	return self.presentAlert('Falla!', 
-	    		'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
-	    }	    
-	    var inParams = [];
-    	inParams.push([['id', '<>', '0']]);    	
-    	var params = [];
-    	params.push(inParams);
+    	    	return self.presentAlert('Falla!', 
+    	    		'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
+    	    }	    
+    	    var inParams = [];
+        	inParams.push([['id', '<>', '0']]);    	
+          inParams.push(['id', 'promocion', 'city_id','name']); //fields
+        	var params = [];
+        	params.push(inParams);
 
-        self.odoo.execute_kw('tours.promociones', 'search', params, function (err2, value2) {
+            self.odoo.execute_kw('tours.promociones', 'search_read', params, function (err2, value) {
 
-            if (err2) {
+                if (err2) {
 
-            	return self.presentAlert('Falla!', 
-            		'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
-            }                        
-            var inParams2 = [];
-	        inParams2.push(value2); //ids
-	        var params = [];
-	        params.push(inParams2);
-	        self.odoo.execute_kw('tours.promociones', 'read', params, function (err3, value3) {
-	            if (err2) { return console.log(err3); }
-	            self.cargar = false;
-	            for (var key in value3) {
-	            	(value3[key]).promocion2 = self._DomSanitizer.bypassSecurityTrustResourceUrl('data:image/jpeg;base64, '+ (value3[key]).promocion);
-	            	(value3[key]).city = (value3[key]).city_id[1];
-            		self.items.push(value3[key]);	 	            		 
-            	}
-	        });	
-        });
-	  });
+                	return self.presentAlert('Falla!', 
+                		'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
+                }                        
+                for (var key in value) {
+                  (value[key]).promocion2 = self._DomSanitizer.bypassSecurityTrustResourceUrl('data:image/jpeg;base64, '+ (value[key]).promocion);
+                  (value[key]).city = (value[key]).city_id[1];
+                  self.items.push(value[key]);                      
+                }
+                self.cargar = false;                  
+                self.storage.set('tours.promociones', value);	
+            });
+    	  });
+      }else{
+
+        for (var key in val) {
+          (val[key]).promocion2 = self._DomSanitizer.bypassSecurityTrustResourceUrl('data:image/jpeg;base64, '+ (val[key]).promocion);
+          self.items.push((val[key]));
+        }
+        self.cargar = false;
+      }      
+    });
   }
 
   presentAlert(titulo, texto) {
