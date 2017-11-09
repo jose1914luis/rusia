@@ -38,8 +38,6 @@ export class ProximoPage {
   items = [];
   cargar = true;
   viewTitle = '';
-  relationship  = 'mensual';
-  //mensaje = '';
   constructor(public navCtrl: NavController, public navParams: NavParams, private alertCtrl: AlertController, private storage: Storage) {
 
     var self = this;
@@ -170,11 +168,5 @@ export class ProximoPage {
       guia:evt.guia,
       ubicacion:evt.ubicacion
     });
-		// let alert = this.alertCtrl.create({
-		//   title: '' + evt.title,
-		//   subTitle: 'De: ' + start + '<br> A: ' + end,
-		//   buttons: ['OK']
-		// });
-		// alert.present();
 	}
 }

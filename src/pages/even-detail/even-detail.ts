@@ -15,7 +15,7 @@ import { NavController, NavParams } from 'ionic-angular';
 export class EvenDetailPage {
 
   
-  event = {title:'', startTime:null, endTime:null, description:null, guia: null, ubicacion:null}
+  event = {title:'', startTime:null, endTime:null, description:null, guia: null, ubicacion:null, home:false}
   constructor(public navCtrl: NavController, public navParams: NavParams) {
   	this.event.title =  this.navParams.data.title;
   	this.event.startTime =  this.navParams.data.startTime;
@@ -23,6 +23,7 @@ export class EvenDetailPage {
   	this.event.description =  this.navParams.data.description;
   	this.event.guia =  this.navParams.data.guia;
   	this.event.ubicacion =  this.navParams.data.ubicacion;
+    this.event.home =  this.navParams.data.home;
   	
   }
 

@@ -37,6 +37,7 @@
   		</ion-item>
 	</ion-list>
 
-  <button ion-button block>Participar en el Tour</button>
+
+  <button *ngIf="!event.home" ion-button block>Participar en el Tour</button>
 
 </ion-content>

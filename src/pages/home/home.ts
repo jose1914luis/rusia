@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
 import { ListPage } from '../../pages/list/list';
 import  * as Odoo from 'odoo-xmlrpc';
+import { EvenDetailPage } from '../even-detail/even-detail';
 
 
 @Component({
@@ -18,16 +19,19 @@ export class HomePage {
   selectedDay = new Date();
   eventSource = [];
   calendar = {
-    eventSource: [], 
+    eventSource:[],
     mode: 'month',
     currentDate: new Date(),
     locale: 'es-RU',
     formatDayHeader: 'E',
     noEventsLabel: 'Sin Eventos',
-    formatMonthTitle:'MMMM yyyy'
+    formatMonthTitle:'MMMM yyyy',
+    allDayLabel: 'Todo el día',
+    formatWeekTitle:'MMMM yyyy, Se $n'
   };
   mensaje  ='';
   cargar =  true;
+  viewTitle = '';
   constructor(public navCtrl: NavController, public modalCtrl: ModalController, private alertCtrl: AlertController, private storage: Storage) {
 
     var self = this;
@@ -50,14 +54,15 @@ export class HomePage {
           inParams.push(['id', 'name', 'tour_id', 'state', 'num_person']); //fields 
           var params = [];
           params.push(inParams);
-          odoo.execute_kw('tours.clientes.solicitudes', 'search_read', params, function (err2, value_s) {
+          odoo.execute_kw('tours.clientes.solicitudes', 'search_read', params, function (err_s, value_s) {
 
-            if (err2) {
+            if (err_s) {
               self.cargar = false;
               return self.presentAlert('Falla!', 
-                'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
+                'Error: '+ JSON.stringify(err_s, Object.getOwnPropertyNames(err_s)) );
             }
 
+            //self.mensaje += JSON.stringify(value_s);
             //Traigo todos los eventos proximos
             var inParams = [];
             inParams.push([['id', '<>', '0']]);  
@@ -71,6 +76,18 @@ export class HomePage {
                 return self.presentAlert('Falla!', 
                   'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
               } 
+
+              /*self.mensaje += '----------------' + JSON.stringify(value);
+
+              for(var key_s in value_s){                    
+
+                for (var key in value) {                  
+                  if(value_s[key_s].tour_id[0] == value[key].id ){//id:3076
+
+                  }                      
+                } 
+              }*/
+
               //traigo toda la informacion de los tours
               var inParams = [];       
               inParams.push([['id', '<>', '0']]);
@@ -114,7 +131,8 @@ export class HomePage {
                         
                   self.cargar = false;       
                   self.calendar.eventSource = events;
-                  self.storage.set('tours.guia', events);
+                  //self.storage.set('tours.guia', events);
+                  self.mensaje += JSON.stringify(events);
               });
 
             });
@@ -130,23 +148,6 @@ export class HomePage {
   }
 
   reloadSource(start, end){
-
-  }
-
-  onEventSelected(evt){
-
-  	let start = moment(evt.startTime).format('LLLL');
-    let end = moment(evt.endTime).format('LLLL');
-    
-    let alert = this.alertCtrl.create({
-      title: '' + evt.title,
-      subTitle: 'From: ' + start + '<br>To: ' + end,
-      buttons: ['OK']
-    });
-    alert.present();
-  }
-
-  onViewTitleChanged(evt){
 
   }
 
@@ -187,6 +188,35 @@ export class HomePage {
       buttons: ['Ok']
     });
     alert.present();
+  }
+
+  onEventSelected(evt){
+
+    moment.locale('es');
+    let start = moment(evt.startTime).format('LLLL');
+    let end = moment(evt.endTime).format('LLLL');
+
+    this.navCtrl.push(EvenDetailPage, {
+      title: evt.title, 
+      startTime: start,
+      endTime: end, 
+      description: evt.description,
+      guia:evt.guia,
+      ubicacion:evt.ubicacion,
+      home:true
+    });
+  }
+
+  onViewTitleChanged(title) {
+    this.viewTitle = title;
+  }
+
+  changeMode(mode) {
+      this.calendar.mode = mode;
+  }
+
+  today() {
+      this.calendar.currentDate = new Date();
   }
 
 }
