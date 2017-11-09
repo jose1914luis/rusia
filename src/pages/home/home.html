@@ -6,6 +6,7 @@
     <ion-title>Mis Eventos</ion-title>
     <ion-buttons end>
       <button ion-button icon-only (click)="addEvent()">
+        Agregar
         <ion-icon name="add"></ion-icon>
       </button>
     </ion-buttons>
@@ -41,7 +42,7 @@
 <ion-footer>
   <!-- Segment buttons with text -->
   <ion-segment [(ngModel)]="calendar.mode" color="primary">
-    <ion-segment-button (ionSelect)="">
+    <ion-segment-button (ionSelect)="today()">
       Hoy
     </ion-segment-button>
     <ion-segment-button (ionSelect)="changeMode('month')">

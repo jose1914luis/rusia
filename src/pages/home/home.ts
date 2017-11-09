@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, ModalController, AlertController } from 'ionic-angular';
-//import { Calendar } from '@ionic-native/calendar';
-//import { NgCalendarModule  } from 'ionic2-calendar';
-import { EventModalPage } from '../../pages/event-modal/event-modal';
+// import { EventModalPage } from '../../pages/event-modal/event-modal';
 import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
 import { ListPage } from '../../pages/list/list';
@@ -77,17 +75,6 @@ export class HomePage {
                   'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
               } 
 
-              /*self.mensaje += '----------------' + JSON.stringify(value);
-
-              for(var key_s in value_s){                    
-
-                for (var key in value) {                  
-                  if(value_s[key_s].tour_id[0] == value[key].id ){//id:3076
-
-                  }                      
-                } 
-              }*/
-
               //traigo toda la informacion de los tours
               var inParams = [];       
               inParams.push([['id', '<>', '0']]);
@@ -132,7 +119,7 @@ export class HomePage {
                   self.cargar = false;       
                   self.calendar.eventSource = events;
                   //self.storage.set('tours.guia', events);
-                  self.mensaje += JSON.stringify(events);
+                  //self.mensaje += JSON.stringify(events);
               });
 
             });
@@ -151,18 +138,17 @@ export class HomePage {
 
   }
 
-  onTimeSelected(evt){
-
-  	this.selectedDay = evt.selectedTime;
-  }
+  
 
   addEvent(){
     //console.log(this.selectedDay);
-  	let modal = this.modalCtrl.create(EventModalPage, {selectedDay: this.selectedDay});
+  	let modal = this.modalCtrl.create(EvenDetailPage, {startTime: new Date(), endTime:new Date(), home:true});
     modal.present();
     modal.onDidDismiss(data => {
       if (data) {
-        let eventData = data;
+
+        this.mensaje += JSON.stringify(data);
+        /*let eventData = data;
         console.log(data.startTime);
         eventData.startTime = new Date(data.startTime);
         console.log(eventData.startTime);
@@ -174,11 +160,11 @@ export class HomePage {
         this.eventSource = [];
         setTimeout(() => {
           this.eventSource = events;
-        });
+        });*/
       }
     });
 
-    this.mensaje = JSON.stringify(this.eventSource);
+    //this.mensaje = JSON.stringify(this.eventSource);
   }
 
   presentAlert(titulo, texto) {

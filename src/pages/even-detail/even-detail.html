@@ -15,29 +15,41 @@
 
 <ion-content padding>
 	
-	<h5>{{event.title}}</h5>	
-	<div><b>Descripción:</b><br>{{event.description}}</div>
-	<ion-list>		
+	<!-- <h5>{{event.title}}</h5>	
+	<div><b>Descripción:</b><br>{{event.description}}</div> -->
+	<ion-list>		 
+    <ion-item>
+      <ion-label color="primary" stacked>Titulo</ion-label>
+      <ion-textarea rows="2" [(ngModel)]="event.title" placeholder="Ingrese una Titulo"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" stacked>Fecha Inicio</ion-label>
+      <ion-datetime displayFormat="MMM DD, YYYY HH:mm" [(ngModel)]="event.startTime" name="startTime" [disabled]="!event.home"></ion-datetime>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" stacked>Fecha Fin</ion-label>
+      <ion-datetime displayFormat="MMM DD, YYYY HH:mm" [(ngModel)]="event.endTime" name="endTime" [disabled]="!event.home"></ion-datetime>
+    </ion-item> 
+    <ion-item>
+      <ion-label color="primary" stacked>Descripción</ion-label>
+      <ion-textarea rows="6" [(ngModel)]="event.description" placeholder="Ingrese una Descripción"></ion-textarea>
+    </ion-item>
+		<ion-item>
+			<ion-label color="primary" stacked>Ubicación</ion-label>
+  		<ion-input type="text" [(ngModel)]="event.ubicacion" [readonly]="!event.home" name="ubicacion"></ion-input>
+		</ion-item>
+		<ion-item>
+			<ion-label color="primary" stacked>Guia</ion-label>
+  		<ion-input type="text" [(ngModel)]="event.guia" [readonly]="!event.home" name="guia"></ion-input>
+		</ion-item>    
 
-  		<ion-item>
-  			<ion-label color="primary" stacked>Fecha Inicio</ion-label>
-    		<ion-input type="text" [(ngModel)]="event.startTime" name="startTime"  [readonly]="true"></ion-input>
-  		</ion-item>
-  		<ion-item>
-  			<ion-label color="primary" stacked>Fecha Fin</ion-label>
-    		<ion-input type="text" [(ngModel)]="event.endTime" name="endTime" [readonly]="true"></ion-input>
-  		</ion-item>  		
-  		<ion-item>
-  			<ion-label color="primary" stacked>Ubicación</ion-label>
-    		<ion-input type="text" [(ngModel)]="event.ubicacion" [readonly]="true" name="ubicacion"></ion-input>
-  		</ion-item>
-  		<ion-item>
-  			<ion-label color="primary" stacked>Guia</ion-label>
-    		<ion-input type="text" [(ngModel)]="event.guia" [readonly]="true" name="guia"></ion-input>
-  		</ion-item>
 	</ion-list>
 
 
   <button *ngIf="!event.home" ion-button block>Participar en el Tour</button>
 
+  <button *ngIf="event.home" ion-button block>Guardar</button>
+
+  <div>{{mensaje}}</div>
 </ion-content>
+
