@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, AlertController } from 'ionic-angular';
 import  * as Odoo from 'odoo-xmlrpc';
 import { CONEXION } from '../../providers/constants/constants';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { Storage } from '@ionic/storage';
 
 

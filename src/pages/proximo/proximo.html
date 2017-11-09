@@ -24,12 +24,13 @@
 
 <ion-content padding>
 
-  <div *ngIf="cargar" style="text-align: center">
-    <ion-spinner icon="lines"></ion-spinner>
+  <div *ngIf="cargar" style="text-align: center">    
+    <ion-spinner name="circles"></ion-spinner><br>
+    <b>Cargando...</b>
   </div>
   
-  <h2>{{viewTitle}}</h2>
-	<calendar
+  <h3>{{viewTitle}}</h3>
+	<calendar *ngIf="!cargar"
         [formatWeekTitle]="calendar.formatWeekTitle"
         [allDayLabel]="calendar.allDayLabel"
         [eventSource]="calendar.eventSource"
@@ -42,7 +43,8 @@
         (onEventSelected)="onEventSelected($event)"
         (onTitleChanged)="onViewTitleChanged($event)"
         step="30">
-  </calendar>  
-  <div>{{mensaje}}</div>
+  </calendar>
+
+  <!-- <div>{{mensaje}}</div> -->
 
 </ion-content>

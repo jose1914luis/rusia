@@ -1,23 +1,30 @@
-<ion-header>
-  <ion-navbar>
-    <button ion-button menuToggle>
-      <ion-icon name="menu"></ion-icon>
-    </button>
-    <ion-title>List</ion-title>
-  </ion-navbar>
-</ion-header>
+<ion-content>  
+   <form (ngSubmit)="doLogin(true)">
 
-<ion-content>
-  <ion-list>
-    <button ion-item *ngFor="let item of items" (click)="itemTapped($event, item)">
-      <ion-icon [name]="item.icon" item-start></ion-icon>
-      {{item.title}}
-      <div class="item-note" item-end>
-        {{item.note}}
+    <div style="text-align: center">
+        <img src="assets/imgs/icon.png?v=1" alt="ToursGratisRusia"/>                
+    </div> 
+
+    <ion-list>
+      <ion-item>
+        <ion-label color="primary" stacked>Usuario</ion-label>
+        <ion-input type="email"  [(ngModel)]="CONEXION.username" required name='username' placeholder="Ingresa Usuario"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label color="primary" stacked>Contraseña</ion-label>
+        <ion-input type="password" [(ngModel)]="CONEXION.password" required name='password'  placeholder="Ingresa Contraseña"></ion-input>
+      </ion-item>
+      <ion-item>
+        <button ion-button block type="submit">Login</button>
+      </ion-item>
+      <div style="text-align: center">
+        <a href="#" (click)="crearCuenta()">No tengo cuenta en ToursGratisRusia</a>    
       </div>
-    </button>
-  </ion-list>
-  <div *ngIf="selectedItem" padding>
-    You navigated here from <b>{{selectedItem.title}}</b>
+    </ion-list>
+  </form>
+  <div *ngIf="cargar" style="text-align: center">    
+    <ion-spinner name="circles"></ion-spinner><br>
+    <b>Verificando...</b>
   </div>
 </ion-content>

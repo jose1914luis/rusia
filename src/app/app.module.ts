@@ -6,6 +6,8 @@ import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { ListPage } from '../pages/list/list';
 import { EventModalPage } from '../pages/event-modal/event-modal';
+import { EvenDetailPage } from '../pages/even-detail/even-detail';
+import { PerfilPage } from '../pages/perfil/perfil';
 import { ContactoPage } from '../pages/contacto/contacto';
 import { FaqPage } from '../pages/faq/faq';
 import { ProximoPage } from '../pages/proximo/proximo';
@@ -33,7 +35,9 @@ import { IonicStorageModule } from '@ionic/storage';
     MapaPage,
     PuntoPage,
     PromocionPage,
-    PromoDetailPage
+    PromoDetailPage,
+    EvenDetailPage,
+    PerfilPage
   ],
   imports: [
     BrowserModule,
@@ -54,7 +58,9 @@ import { IonicStorageModule } from '@ionic/storage';
     MapaPage,
     PuntoPage,
     PromocionPage,
-    PromoDetailPage
+    PromoDetailPage,
+    EvenDetailPage,
+    PerfilPage
   ],
   providers: [
     StatusBar,

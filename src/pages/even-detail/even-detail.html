@@ -1,0 +1,42 @@
+<!--
+  Generated template for the EvenDetailPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Evento</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+	
+	<h5>{{event.title}}</h5>	
+	<div><b>Descripción:</b><br>{{event.description}}</div>
+	<ion-list>		
+
+  		<ion-item>
+  			<ion-label color="primary" stacked>Fecha Inicio</ion-label>
+    		<ion-input type="text" [(ngModel)]="event.startTime" name="startTime"  [readonly]="true"></ion-input>
+  		</ion-item>
+  		<ion-item>
+  			<ion-label color="primary" stacked>Fecha Fin</ion-label>
+    		<ion-input type="text" [(ngModel)]="event.endTime" name="endTime" [readonly]="true"></ion-input>
+  		</ion-item>  		
+  		<ion-item>
+  			<ion-label color="primary" stacked>Ubicación</ion-label>
+    		<ion-input type="text" [(ngModel)]="event.ubicacion" [readonly]="true" name="ubicacion"></ion-input>
+  		</ion-item>
+  		<ion-item>
+  			<ion-label color="primary" stacked>Guia</ion-label>
+    		<ion-input type="text" [(ngModel)]="event.guia" [readonly]="true" name="guia"></ion-input>
+  		</ion-item>
+	</ion-list>
+
+  <button ion-button block>Participar en el Tour</button>
+
+</ion-content>

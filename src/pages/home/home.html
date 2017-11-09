@@ -14,7 +14,11 @@
 
 <ion-content padding>
 
-  <calendar [eventSource]="calendar.eventSource"
+  <div *ngIf="cargar" style="text-align: center">    
+    <ion-spinner name="circles"></ion-spinner><br>
+    <b>Cargando...</b>
+  </div>
+  <!--calendar [eventSource]="calendar.eventSource"
         [calendarMode]="calendar.mode"
         [currentDate]="calendar.currentDate"
         [locale]="calendar.locale"
@@ -27,7 +31,7 @@
         (onTitleChanged)="onViewTitleChanged($event)"
         (onTimeSelected)="onTimeSelected($event)"
         step="30">
-      </calendar>
+      </calendar-->
 
       <div>{{mensaje}}</div>
 

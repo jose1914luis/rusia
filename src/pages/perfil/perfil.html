@@ -7,12 +7,30 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>perfil</ion-title>
+  	<button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Perfil</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
+	
+	 <ion-list>
+	    <ion-item>
+			<img [src]="user.image" alt="Sin imagen">
+		</ion-item>
+		<ion-item>		
+	        <ion-input type="text"  [(ngModel)]="user.name" name='name' [readonly]="true"></ion-input>
+		</ion-item>
+		<ion-item>		
+	        <ion-input type="text"  [(ngModel)]="user.login" name='login' [readonly]="true"></ion-input>
+		</ion-item>
+		<ion-item>
+        	<button ion-button block type="button" color="danger" (click)="salir()">Salir</button>
+      	</ion-item>
+	 </ion-list>
 
 </ion-content>
