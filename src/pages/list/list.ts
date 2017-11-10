@@ -20,6 +20,7 @@ export class ListPage {
     password: '',//password: '123456',    
   };  
   cargar = false;
+  mensaje = '';
   constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, public alertCtrl: AlertController) {
     
     var borrar = this.navParams.get('borrar');
@@ -77,20 +78,50 @@ export class ListPage {
             return self.presentAlert('Falla!', 
               'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
           }
+
+          var user = {id:null,name:null,image:null,login:null,cliente_id:null};
           for (var key in value) {     
             if(value[key].login == con.username || value[key].user_email == con.username){
 
               self.storage.set('CONEXION', con);
-              self.storage.set('res.users', {
-                id:value[key].id, 
-                name:value[key].name, 
-                image:value[key].image,
-                login:value[key].login                 
-              });
-
-              self.navCtrl.setRoot(HomePage);              
+              user.id = value[key].id;
+              user.name = value[key].name;
+              //user.image = value[key].image;
+              user.login = value[key].login;              
+              /*
+              id= value[key].id;*/
+              break;
+              //self.navCtrl.setRoot(HomePage);              
             }
           }
+//self.mensaje += 'entro';
+          var inParams = [];
+          inParams.push([['uid', '=', user.id]]);
+          inParams.push(['id', 'name', 'uid']); //fields
+          inParams.push(0); //offset
+          inParams.push(5); //limit
+          var params = [];
+          params.push(inParams);
+          odoo.execute_kw('tours.clientes', 'search_read', params, function (err3, value2) {
+            //self.mensaje += 'entro';
+              if (err3) {
+                self.cargar = false;
+                return self.presentAlert('Falla!', 
+                  'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );
+              }
+
+              
+              //self.mensaje += JSON.stringify(value2);
+              for (var key in value2) {
+                user.cliente_id = value2[key].id;//[value2[key].id, value2[key].name];
+              }
+
+              self.storage.set('res.users', user);
+              self.navCtrl.setRoot(HomePage);
+              //self.mensaje += JSON.stringify(user);
+          });
+
+          
         });
       });    
     });

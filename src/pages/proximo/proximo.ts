@@ -90,7 +90,8 @@ export class ProximoPage {
                               allDay: false,
                               description: (value2[key2]).description,
                               guia: (value[key]).guia_id[1],
-                              ubicacion: (value2[key2]).company_id[1]
+                              ubicacion: (value2[key2]).company_id[1],
+                              tour_id:(value[key]).id
                             });            
                             break;
                           }
@@ -115,7 +116,8 @@ export class ProximoPage {
                 allDay: false,
                 description: (val[key]).description,
                 guia: (val[key]).guia,
-                ubicacion: (val[key]).ubicacion
+                ubicacion: (val[key]).ubicacion,
+                tour_id: (val[key]).tour_id
               });         
             }       
             self.cargar = false;       
@@ -160,6 +162,7 @@ export class ProximoPage {
       description: evt.description,
       guia:evt.guia,
       ubicacion:evt.ubicacion,
+      tour_id:evt.tour_id,
       home:false
     });
 	}

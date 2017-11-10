@@ -58,7 +58,7 @@ export class HomePage {
                 'Error: '+ JSON.stringify(err_s, Object.getOwnPropertyNames(err_s)) );
             }
 
-            //self.mensaje += JSON.stringify(value_s);
+            self.mensaje += JSON.stringify(value_s);
             //Traigo todos los eventos proximos
             var inParams = [];
             inParams.push([['id', '<>', '0']]);  

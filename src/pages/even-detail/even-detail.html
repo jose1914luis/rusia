@@ -15,6 +15,7 @@
 
 <ion-content padding>
 	
+  <div>{{mensaje}}</div>
 	<!-- <h5>{{event.title}}</h5>	
 	<div><b>Descripción:</b><br>{{event.description}}</div> -->
 	<ion-list>		 
@@ -46,10 +47,10 @@
 	</ion-list>
 
 
-  <button *ngIf="!event.home" ion-button block>Participar en el Tour</button>
+  <button *ngIf="!event.home" ion-button block (click)="participar()">Participar en el Tour</button>
 
   <button *ngIf="event.home" ion-button block (click)="guardar()" >Guardar</button>
 
-  <div>{{mensaje}}</div>
+  
 </ion-content>
 
