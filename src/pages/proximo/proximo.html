@@ -10,13 +10,7 @@
   	<button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Proximos Tours</ion-title>  
-    <ion-buttons end>
-      <button ion-button [disabled]="isToday" (click)="today()">Hoy</button>
-      <button ion-button (click)="changeMode('month')">M</button>
-      <button ion-button (click)="changeMode('week')">S</button>
-      <button ion-button (click)="changeMode('day')">D</button>
-    </ion-buttons>
+    <ion-title>Proximos Tours</ion-title>      
   </ion-navbar>
 
 </ion-header>
@@ -48,3 +42,21 @@
   <!-- <div>{{mensaje}}</div> -->
 
 </ion-content>
+
+<ion-footer>
+  <!-- Segment buttons with text -->
+  <ion-segment [(ngModel)]="calendar.mode" color="primary">
+    <ion-segment-button (ionSelect)="today()">
+      Hoy
+    </ion-segment-button>
+    <ion-segment-button (ionSelect)="changeMode('month')">
+      Mes
+    </ion-segment-button>
+    <ion-segment-button (ionSelect)="changeMode('week')">
+      Semana
+    </ion-segment-button>
+    <ion-segment-button (ionSelect)="changeMode('day')">
+      Dia
+    </ion-segment-button>
+  </ion-segment>
+</ion-footer>

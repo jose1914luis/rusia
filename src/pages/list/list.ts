@@ -27,6 +27,10 @@ export class ListPage {
     if(borrar == true){
       this.storage.set('CONEXION', null);
       this.storage.set('res.users', null);
+      this.storage.set('tours.guia', null);
+      this.storage.set('tours.clientes.faq', null);
+      this.storage.set('tours.companies', null);
+      this.storage.set('tours.promociones', null);  
     }else{
       this.doLogin(false);
     }    
@@ -88,8 +92,7 @@ export class ListPage {
             }
           }
         });
-      });
-    
+      });    
     });
     /*this.navCtrl.setRoot(HomePage);*/
   }

@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 import { NavController, ModalController, AlertController } from 'ionic-angular';
-// import { EventModalPage } from '../../pages/event-modal/event-modal';
-import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
 import { ListPage } from '../../pages/list/list';
 import  * as Odoo from 'odoo-xmlrpc';
@@ -15,7 +13,7 @@ import { EvenDetailPage } from '../even-detail/even-detail';
 export class HomePage {
 
   selectedDay = new Date();
-  eventSource = [];
+  
   calendar = {
     eventSource:[],
     mode: 'month',
@@ -130,41 +128,37 @@ export class HomePage {
     });
   }
 
-  onCurrentDateChanged(evt){
+  /*onCurrentDateChanged(evt){
 
   }
 
   reloadSource(start, end){
 
-  }
+  }*/
 
   
 
   addEvent(){
-    //console.log(this.selectedDay);
+
   	let modal = this.modalCtrl.create(EvenDetailPage, {startTime: new Date(), endTime:new Date(), home:true});
     modal.present();
     modal.onDidDismiss(data => {
       if (data) {
 
-        this.mensaje += JSON.stringify(data);
-        /*let eventData = data;
+        let eventData = data;
         console.log(data.startTime);
         eventData.startTime = new Date(data.startTime);
         console.log(eventData.startTime);
         eventData.endTime = new Date(data.endTime);
- 
-        let events = this.eventSource;
-        console.log(eventData);
+        let events = this.calendar.eventSource;        
         events.push(eventData);
-        this.eventSource = [];
-        setTimeout(() => {
-          this.eventSource = events;
-        });*/
-      }
-    });
+        this.calendar.eventSource = [];
 
-    //this.mensaje = JSON.stringify(this.eventSource);
+        setTimeout(() => {
+          this.calendar.eventSource = events;
+        });
+      }
+    });    
   }
 
   presentAlert(titulo, texto) {
@@ -178,18 +172,14 @@ export class HomePage {
 
   onEventSelected(evt){
 
-    moment.locale('es');
-    let start = moment(evt.startTime).format('LLLL');
-    let end = moment(evt.endTime).format('LLLL');
-
     this.navCtrl.push(EvenDetailPage, {
       title: evt.title, 
-      startTime: start,
-      endTime: end, 
+      startTime: evt.startTime,
+      endTime: evt.endTime, 
       description: evt.description,
       guia:evt.guia,
       ubicacion:evt.ubicacion,
-      home:true
+      home:false
     });
   }
 

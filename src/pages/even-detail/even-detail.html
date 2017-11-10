@@ -20,7 +20,7 @@
 	<ion-list>		 
     <ion-item>
       <ion-label color="primary" stacked>Titulo</ion-label>
-      <ion-textarea rows="2" [(ngModel)]="event.title" placeholder="Ingrese una Titulo"></ion-textarea>
+      <ion-textarea rows="2" [(ngModel)]="event.title" [readonly]="!event.home" placeholder="Ingrese una Titulo"></ion-textarea>
     </ion-item>
     <ion-item>
       <ion-label color="primary" stacked>Fecha Inicio</ion-label>
@@ -32,7 +32,7 @@
     </ion-item> 
     <ion-item>
       <ion-label color="primary" stacked>Descripción</ion-label>
-      <ion-textarea rows="6" [(ngModel)]="event.description" placeholder="Ingrese una Descripción"></ion-textarea>
+      <ion-textarea rows="6" [(ngModel)]="event.description" [readonly]="!event.home" placeholder="Ingrese una Descripción"></ion-textarea>
     </ion-item>
 		<ion-item>
 			<ion-label color="primary" stacked>Ubicación</ion-label>
@@ -48,7 +48,7 @@
 
   <button *ngIf="!event.home" ion-button block>Participar en el Tour</button>
 
-  <button *ngIf="event.home" ion-button block>Guardar</button>
+  <button *ngIf="event.home" ion-button block (click)="guardar()" >Guardar</button>
 
   <div>{{mensaje}}</div>
 </ion-content>
