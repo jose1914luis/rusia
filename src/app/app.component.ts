@@ -36,7 +36,7 @@ export class MyApp {
       { title: 'Mapas', component: MapaPage },
       { title: 'Promociones', component: PromocionPage },
       { title: 'Preguntas F.A.Q.', component: FaqPage },
-      { title: 'Contactenos', component: ContactoPage },
+      { title: 'Contacto', component: ContactoPage },
       { title: 'Mi perfil', component: PerfilPage }
 
     ];

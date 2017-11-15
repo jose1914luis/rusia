@@ -10,7 +10,7 @@
   	<button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Contactenos</ion-title>
+    <ion-title>Contacto</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -20,18 +20,24 @@
 
 	<form>
 		<ion-list> 
-		  <ion-item>
-		    <ion-label color="primary" stacked>Asunto</ion-label>
-		    <ion-input type="email" ></ion-input>
+		   <ion-item>
+		    <ion-label color="primary" stacked>Para</ion-label>
+		    <ion-input type="text" [(ngModel)]="mail.para" [readonly]="true" name="para"></ion-input>
 		  </ion-item>
 		  <ion-item>
-		    <ion-textarea max="1000" placeholder="Mensaje"></ion-textarea>
+		    <ion-label color="primary" stacked>Asunto</ion-label>
+		    <ion-input type="text" [(ngModel)]="mail.asunto" name="asunto"></ion-input>
+		  </ion-item>
+		  <ion-item>
+		  	<ion-label color="primary" stacked>Descripción</ion-label>
+		    <ion-textarea rows="6" max="1000" placeholder="Mensaje" [(ngModel)]="mail.mensaje" name="mensaje"></ion-textarea>
 		  </ion-item>
 
 		  <ion-item>
-		   <button ion-button block>Enviar</button>
+		   <a ion-button block href="mailto:{{mail.para}}?subject={{mail.asunto}}&body={{mail.mensaje}}" (click)="enviar()">Enviar</a>
 		  </ion-item>
 		</ion-list>
 	</form>
+	<!-- <div>{{mensaje}}</div> -->
 
 </ion-content>

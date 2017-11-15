@@ -3,6 +3,7 @@ import { NavController, NavParams, AlertController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { HomePage } from '../../pages/home/home';
 import  * as Odoo from 'odoo-xmlrpc';
+import { CrearCuentaPage } from '../../pages/crear-cuenta/crear-cuenta';
 
 @Component({
   selector: 'page-list',
@@ -34,7 +35,7 @@ export class ListPage {
       this.storage.set('tours.promociones', null);  
     }else{
       this.doLogin(false);
-    }    
+    }   
   }
 
   doLogin(verificar){
@@ -137,7 +138,7 @@ export class ListPage {
     alert.present();
   }
   crearCuenta(){
-
+    this.navCtrl.push(CrearCuentaPage);
   }
 
 }

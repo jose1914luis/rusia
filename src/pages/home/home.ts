@@ -58,7 +58,7 @@ export class HomePage {
                 'Error: '+ JSON.stringify(err_s, Object.getOwnPropertyNames(err_s)) );
             }
 
-            self.mensaje += JSON.stringify(value_s);
+            //self.mensaje += JSON.stringify(value_s);
             //Traigo todos los eventos proximos
             var inParams = [];
             inParams.push([['id', '<>', '0']]);  
@@ -105,7 +105,8 @@ export class HomePage {
                               allDay: false,
                               description: (value2[key2]).description,
                               guia: (value[key]).guia_id[1],
-                              ubicacion: (value2[key2]).company_id[1]
+                              ubicacion: (value2[key2]).company_id[1],
+                              estado: value_s[key_s].state
                             });            
                             break;
                           }
@@ -126,17 +127,7 @@ export class HomePage {
         });
       }
     });
-  }
-
-  /*onCurrentDateChanged(evt){
-
-  }
-
-  reloadSource(start, end){
-
-  }*/
-
-  
+  }  
 
   addEvent(){
 
@@ -179,7 +170,8 @@ export class HomePage {
       description: evt.description,
       guia:evt.guia,
       ubicacion:evt.ubicacion,
-      home:false
+      home:false,
+      estado:evt.estado
     });
   }
 

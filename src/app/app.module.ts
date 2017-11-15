@@ -14,12 +14,15 @@ import { MapaPage } from '../pages/mapa/mapa';
 import { PuntoPage } from '../pages/punto/punto';
 import { PromocionPage } from '../pages/promocion/promocion';
 import { PromoDetailPage } from '../pages/promo-detail/promo-detail';
+import { CrearCuentaPage } from '../pages/crear-cuenta/crear-cuenta';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { NgCalendarModule  } from 'ionic2-calendar';
 import { HttpModule } from '@angular/http';
 import { IonicStorageModule } from '@ionic/storage';
+
+
 
 
 @NgModule({
@@ -35,7 +38,8 @@ import { IonicStorageModule } from '@ionic/storage';
     PromocionPage,
     PromoDetailPage,
     EvenDetailPage,
-    PerfilPage
+    PerfilPage,
+    CrearCuentaPage
   ],
   imports: [
     BrowserModule,
@@ -57,7 +61,8 @@ import { IonicStorageModule } from '@ionic/storage';
     PromocionPage,
     PromoDetailPage,
     EvenDetailPage,
-    PerfilPage
+    PerfilPage,
+    CrearCuentaPage
   ],
   providers: [
     StatusBar,

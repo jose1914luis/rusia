@@ -14,10 +14,7 @@
 
 
 <ion-content padding>
-	
-  <div>{{mensaje}}</div>
-	<!-- <h5>{{event.title}}</h5>	
-	<div><b>Descripción:</b><br>{{event.description}}</div> -->
+
 	<ion-list>		 
     <ion-item>
       <ion-label color="primary" stacked>Titulo</ion-label>
@@ -46,10 +43,20 @@
 
 	</ion-list>
 
+  
+  <div style="width: 100%; text-align: center;"><h4 *ngIf="event.estado_bol" ion-text color="{{event_color}}">{{event_estado}}</h4></div>
 
-  <button *ngIf="!event.home" ion-button block (click)="participar()">Participar en el Tour</button>
+  <button *ngIf="(!event.home && !event.estado_bol)" ion-button block (click)="participar()">Participar en el Tour</button>
 
-  <button *ngIf="event.home" ion-button block (click)="guardar()" >Guardar</button>
+<!-- Segment buttons with text -->
+  <ion-segment *ngIf="event.home" color="dark">
+    <ion-segment-button value="friends" (ionSelect)="cancelar()">
+      Cancelar
+    </ion-segment-button>
+    <ion-segment-button value="guardar" (ionSelect)="guardar()">
+      Guardar
+    </ion-segment-button>
+  </ion-segment>
 
   
 </ion-content>

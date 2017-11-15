@@ -18,7 +18,9 @@ import  * as Odoo from 'odoo-xmlrpc';
 export class EvenDetailPage {
 
   mensaje = '';
-  event = {title:'', startTime:null, endTime:null, allDay: false, description:null, guia: null, ubicacion:null, home:false, tour_id:null}
+  event_estado = '';
+  event_color = '';
+  event = {estado_bol:false, estado:null, title:'', startTime:null, endTime:null, allDay: false, description:null, guia: null, ubicacion:null, home:false, tour_id:null}
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, private alertCtrl: AlertController, private storage: Storage) {
   	this.event.title =  this.navParams.get('title');
   	this.event.startTime =  this.navParams.get('startTime').toISOString();
@@ -28,9 +30,21 @@ export class EvenDetailPage {
   	this.event.ubicacion =  this.navParams.get('ubicacion');
     this.event.home =  this.navParams.get('home');  	
     this.event.tour_id =  this.navParams.get('tour_id');
+    this.event.estado =  this.navParams.get('estado');
+    if(this.event.estado == 'borrador'){
+      this.event.estado_bol = true;
+      this.event_estado = 'Esperando aceptación de solicitud';
+      this.event_color = 'danger';
+    }else if(this.event.estado == 'aceptado'){
 
-    
-    //this.mensaje += 'entro';
+      this.event.estado_bol = true;
+      this.event_estado = 'Solicitud Aceptada';
+      this.event_color = 'secondary';
+    }else if(this.event.estado == 'rechazado'){
+      this.event.estado_bol = true;
+      this.event_estado = 'Solicitud Rechazada';
+      this.event_color = 'danger';
+    }
 
   }
 
@@ -39,7 +53,30 @@ export class EvenDetailPage {
   }
 
   participar(){
-    this.presentPrompt();    
+    let alert = this.alertCtrl.create({
+      title: '¿Desea apuntarse a este tour?',
+      message: 'Un gerente validará su petición',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Si',
+          handler: () => {
+            this.presentPrompt();
+          }
+        }
+      ]
+    });
+    alert.present();    
+  }
+
+  cancelar(){
+    this.viewCtrl.dismiss(null);
   }
 
   guardar(){
@@ -111,7 +148,7 @@ export class EvenDetailPage {
                               return self.presentAlert('Falla!', 
                                 'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
                             }
-                            //self.mensaje += '  siguiente ID en tours.clientes.solicitudes:'+ JSON.stringify(value);
+                            self.presentAlert('Alerta!','Has solicitado participar en este tour:<br><b>Estado: Pendiente</b>');
                         });
                       }
                   });

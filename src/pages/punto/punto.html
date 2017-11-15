@@ -27,11 +27,39 @@
   
  <ion-slides pager=true zoom="true">
     <ion-slide *ngFor="let item of items;" (ionSlideDidChange)="slideChanged()">      
-      <a href="{{item.url_map}}" ion-button color="light"><ion-icon name="navigate"></ion-icon> Ver en Mapa</a>
+      <ion-card>
+
+        <img [src]="item.punto_encuentro2" alt="Sin mapa">
+
+        <ion-item>
+          <ion-icon name="football" item-start large></ion-icon>
+          <h2>Museum of Football</h2>
+          <p>11 N. Way St, Madison, WI 53703</p>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="wine" item-left large ></ion-icon>
+          <h2>Institute of Fine Cocktails</h2>
+          <p>14 S. Hop Avenue, Madison, WI 53703</p>
+        </ion-item>
+
+        <ion-item>
+          <span item-left>18 min</span>
+          <span item-left>(2.6 mi)</span>
+          <button ion-button icon-left clear item-end>
+            <ion-icon name="navigate"></ion-icon>
+            Start
+          </button>
+        </ion-item>
+
+    </ion-card>
+
+
+     <!--  <a href="{{item.url_map}}" ion-button color="light"><ion-icon name="navigate"></ion-icon> Ver en Mapa</a>
       <p text-wrap >En caso de emergencia, pulse el boton:<p>
       <a href="tel:{{item.phone}}" ion-button color="danger"><ion-icon name="call"></ion-icon>  {{item.phone}}</a><br>
       <a>{{item.name}}</a><br>
-      <img [src]="item.punto_encuentro2" alt="Sin mapa">
+      <img [src]="item.punto_encuentro2" alt="Sin mapa"> -->
     </ion-slide>
   </ion-slides> 
 

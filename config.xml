@@ -6,6 +6,7 @@
     <content src="index.html" />
     <access origin="*" />
     <access launch-external="yes" origin="tel:*" />
+    <access launch-external="true" origin="mailto:*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="tel:*" />
@@ -88,4 +89,5 @@
     <allow-navigation href="http://192.168.0.4:8100" />
     <plugin name="cordova-sqlite-storage" spec="~2.0.4" />
     <allow-navigation href="http://192.168.0.4:8101" />
+    <plugin name="cordova-plugin-email-composer" spec="~0.8.11" />
 </widget>
