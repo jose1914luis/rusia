@@ -21,6 +21,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { NgCalendarModule  } from 'ionic2-calendar';
 import { HttpModule } from '@angular/http';
 import { IonicStorageModule } from '@ionic/storage';
+import { Camera } from '@ionic-native/camera';
 
 
 
@@ -65,6 +66,7 @@ import { IonicStorageModule } from '@ionic/storage';
     CrearCuentaPage
   ],
   providers: [
+    Camera,
     StatusBar,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler}

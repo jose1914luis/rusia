@@ -32,34 +32,25 @@
         <img [src]="item.punto_encuentro2" alt="Sin mapa">
 
         <ion-item>
-          <ion-icon name="football" item-start large></ion-icon>
-          <h2>Museum of Football</h2>
-          <p>11 N. Way St, Madison, WI 53703</p>
+          <ion-icon name="pin" item-start large></ion-icon>
+          <h1>{{item.name}}</h1>
         </ion-item>
 
         <ion-item>
-          <ion-icon name="wine" item-left large ></ion-icon>
-          <h2>Institute of Fine Cocktails</h2>
-          <p>14 S. Hop Avenue, Madison, WI 53703</p>
+          <ion-icon name="call" item-left large ></ion-icon>
+          <h2>En caso de emergencia, pulse el boton</h2>          
+          <a href="tel:{{item.phone}}" ion-button color="danger">Llamar: {{item.phone}}</a><br>
         </ion-item>
 
         <ion-item>
-          <span item-left>18 min</span>
-          <span item-left>(2.6 mi)</span>
-          <button ion-button icon-left clear item-end>
-            <ion-icon name="navigate"></ion-icon>
-            Start
-          </button>
+          <ion-icon name="navigate" item-start large></ion-icon>
+          <!-- <button ion-button icon-left clear item-end>
+            Ver en Mapa
+          </button> -->
+          <a href="{{item.url_map}}" ion-button color="light">Ver en Mapa</a>
         </ion-item>
 
-    </ion-card>
-
-
-     <!--  <a href="{{item.url_map}}" ion-button color="light"><ion-icon name="navigate"></ion-icon> Ver en Mapa</a>
-      <p text-wrap >En caso de emergencia, pulse el boton:<p>
-      <a href="tel:{{item.phone}}" ion-button color="danger"><ion-icon name="call"></ion-icon>  {{item.phone}}</a><br>
-      <a>{{item.name}}</a><br>
-      <img [src]="item.punto_encuentro2" alt="Sin mapa"> -->
+      </ion-card>
     </ion-slide>
   </ion-slides> 
 

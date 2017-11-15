@@ -90,4 +90,5 @@
     <plugin name="cordova-sqlite-storage" spec="~2.0.4" />
     <allow-navigation href="http://192.168.0.4:8101" />
     <plugin name="cordova-plugin-email-composer" spec="~0.8.11" />
+    <plugin name="cordova-plugin-camera" spec="~2.4.1" />
 </widget>

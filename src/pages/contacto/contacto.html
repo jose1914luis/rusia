@@ -18,7 +18,7 @@
 
 <ion-content padding>
 
-	<form>
+	<form (ngSubmit)="enviar()">
 		<ion-list> 
 		   <ion-item>
 		    <ion-label color="primary" stacked>Para</ion-label>
@@ -34,7 +34,7 @@
 		  </ion-item>
 
 		  <ion-item>
-		   <a ion-button block href="mailto:{{mail.para}}?subject={{mail.asunto}}&body={{mail.mensaje}}" (click)="enviar()">Enviar</a>
+		   <button ion-button block type="submit">Enviar</button>
 		  </ion-item>
 		</ion-list>
 	</form>

@@ -10,9 +10,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import * as Odoo from 'odoo-xmlrpc';
-import { CONEXION } from '../../providers/constants/constants';
 import { DomSanitizer } from '@angular/platform-browser';
 import { PromoDetailPage } from '../../pages/promo-detail/promo-detail';
+import { Storage } from '@ionic/storage';
+import { ListPage } from '../../pages/list/list';
 /**
  * Generated class for the PromocionPage page.
  *
@@ -21,43 +22,57 @@ import { PromoDetailPage } from '../../pages/promo-detail/promo-detail';
  */
 var PromocionPage = /** @class */ (function () {
     //promocion = {city:'', numero:0, items:[]};
-    function PromocionPage(navCtrl, navParams, alertCtrl, _DomSanitizer) {
+    function PromocionPage(navCtrl, navParams, alertCtrl, _DomSanitizer, storage) {
+        var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.alertCtrl = alertCtrl;
         this._DomSanitizer = _DomSanitizer;
-        this.odoo = new Odoo(CONEXION);
+        this.storage = storage;
         this.items = [];
         this.cargar = true;
         var self = this;
-        this.odoo.connect(function (err) {
-            if (err) {
-                return self.presentAlert('Falla!', 'Error: ' + JSON.stringify(err, Object.getOwnPropertyNames(err)));
+        self.items = [];
+        this.storage.get('CONEXION').then(function (val) {
+            if (val == null) {
+                self.navCtrl.setRoot(ListPage, { borrar: true, login: null });
             }
-            var inParams = [];
-            inParams.push([['id', '<>', '0']]);
-            var params = [];
-            params.push(inParams);
-            self.odoo.execute_kw('tours.promociones', 'search', params, function (err2, value2) {
-                if (err2) {
-                    return self.presentAlert('Falla!', 'Error: ' + JSON.stringify(err2, Object.getOwnPropertyNames(err2)));
-                }
-                var inParams2 = [];
-                inParams2.push(value2); //ids
-                var params = [];
-                params.push(inParams2);
-                self.odoo.execute_kw('tours.promociones', 'read', params, function (err3, value3) {
-                    if (err2) {
-                        return console.log(err3);
+            else {
+                var odoo = new Odoo(val);
+                _this.storage.get('tours.promociones').then(function (val) {
+                    if (val == null) {
+                        odoo.connect(function (err) {
+                            if (err) {
+                                return self.presentAlert('Falla!', 'Error: ' + JSON.stringify(err, Object.getOwnPropertyNames(err)));
+                            }
+                            var inParams = [];
+                            inParams.push([['id', '<>', '0']]);
+                            inParams.push(['id', 'promocion', 'city_id', 'name']); //fields
+                            var params = [];
+                            params.push(inParams);
+                            odoo.execute_kw('tours.promociones', 'search_read', params, function (err2, value) {
+                                if (err2) {
+                                    return self.presentAlert('Falla!', 'Error: ' + JSON.stringify(err2, Object.getOwnPropertyNames(err2)));
+                                }
+                                for (var key in value) {
+                                    (value[key]).promocion2 = self._DomSanitizer.bypassSecurityTrustResourceUrl('data:image/jpeg;base64, ' + (value[key]).promocion);
+                                    (value[key]).city = (value[key]).city_id[1];
+                                    self.items.push(value[key]);
+                                }
+                                self.cargar = false;
+                                self.storage.set('tours.promociones', value);
+                            });
+                        });
                     }
-                    self.cargar = false;
-                    for (var key in value3) {
-                        (value3[key]).promocion2 = self._DomSanitizer.bypassSecurityTrustResourceUrl('data:image/jpeg;base64, ' + (value3[key]).promocion);
-                        (value3[key]).city = (value3[key]).city_id[1];
-                        self.items.push(value3[key]);
+                    else {
+                        for (var key in val) {
+                            (val[key]).promocion2 = self._DomSanitizer.bypassSecurityTrustResourceUrl('data:image/jpeg;base64, ' + (val[key]).promocion);
+                            self.items.push((val[key]));
+                        }
+                        self.cargar = false;
                     }
                 });
-            });
+            }
         });
     }
     PromocionPage.prototype.presentAlert = function (titulo, texto) {
@@ -79,7 +94,7 @@ var PromocionPage = /** @class */ (function () {
             selector: 'page-promocion',
             templateUrl: 'promocion.html',
         }),
-        __metadata("design:paramtypes", [NavController, NavParams, AlertController, DomSanitizer])
+        __metadata("design:paramtypes", [NavController, NavParams, AlertController, DomSanitizer, Storage])
     ], PromocionPage);
     return PromocionPage;
 }());

@@ -10,50 +10,58 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import * as Odoo from 'odoo-xmlrpc';
-import { CONEXION } from '../../providers/constants/constants';
-/**
- * Generated class for the FaqPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+import { ListPage } from '../../pages/list/list';
+import { Storage } from '@ionic/storage';
 var FaqPage = /** @class */ (function () {
-    function FaqPage(navCtrl, navParams, alertCtrl) {
+    function FaqPage(navCtrl, navParams, alertCtrl, storage) {
+        var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.alertCtrl = alertCtrl;
-        this.odoo = new Odoo(CONEXION);
+        this.storage = storage;
         this.items = [];
         this.cargar = true;
         var self = this;
-        this.odoo.connect(function (err) {
-            if (err) {
-                return self.presentAlert('Falla!', 'Error: ' + JSON.stringify(err, Object.getOwnPropertyNames(err)));
+        self.items = [];
+        this.storage.get('CONEXION').then(function (val) {
+            if (val == null) {
+                self.navCtrl.setRoot(ListPage, { borrar: true, login: null });
             }
-            var inParams = [];
-            inParams.push([['id', '<>', '0']]);
-            var params = [];
-            params.push(inParams);
-            self.odoo.execute_kw('tours.clientes.faq', 'search', params, function (err2, value2) {
-                if (err2) {
-                    return self.presentAlert('Falla!', 'Error: ' + JSON.stringify(err2, Object.getOwnPropertyNames(err2)));
-                }
-                var inParams2 = [];
-                inParams2.push(value2); //ids
-                var params = [];
-                params.push(inParams2);
-                self.odoo.execute_kw('tours.clientes.faq', 'read', params, function (err3, value3) {
-                    if (err2) {
-                        return console.log(err3);
+            else {
+                var odoo = new Odoo(val);
+                _this.storage.get('tours.clientes.faq').then(function (val) {
+                    if (val == null) {
+                        odoo.connect(function (err) {
+                            if (err) {
+                                return self.presentAlert('Falla!', 'Error: ' + JSON.stringify(err, Object.getOwnPropertyNames(err)));
+                            }
+                            var inParams = [];
+                            inParams.push([['id', '<>', '0']]);
+                            inParams.push(['id', 'response', 'name']); //fields
+                            var params = [];
+                            params.push(inParams);
+                            odoo.execute_kw('tours.clientes.faq', 'search_read', params, function (err2, value) {
+                                if (err2) {
+                                    return self.presentAlert('Falla!', 'Error: ' + JSON.stringify(err2, Object.getOwnPropertyNames(err2)));
+                                }
+                                for (var key in value) {
+                                    (value[key]).icon = 'arrow-dropdown-circle';
+                                    (value[key]).visible = false;
+                                    self.items.push((value[key]));
+                                }
+                                self.cargar = false;
+                                self.storage.set('tours.clientes.faq', value);
+                            });
+                        });
                     }
-                    self.cargar = false;
-                    for (var key in value3) {
-                        (value3[key]).icon = 'arrow-dropdown-circle';
-                        (value3[key]).visible = false;
-                        self.items.push((value3[key]));
+                    else {
+                        for (var key in val) {
+                            self.items.push((val[key]));
+                        }
+                        self.cargar = false;
                     }
                 });
-            });
+            }
         });
     }
     FaqPage.prototype.presentAlert = function (titulo, texto) {
@@ -83,7 +91,7 @@ var FaqPage = /** @class */ (function () {
             selector: 'page-faq',
             templateUrl: 'faq.html',
         }),
-        __metadata("design:paramtypes", [NavController, NavParams, AlertController])
+        __metadata("design:paramtypes", [NavController, NavParams, AlertController, Storage])
     ], FaqPage);
     return FaqPage;
 }());

@@ -87,7 +87,7 @@ export class ListPage {
               self.storage.set('CONEXION', con);
               user.id = value[key].id;
               user.name = value[key].name;
-              //user.image = value[key].image;
+              user.image = value[key].image;
               user.login = value[key].login;              
               /*
               id= value[key].id;*/

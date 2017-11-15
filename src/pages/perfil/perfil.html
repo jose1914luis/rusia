@@ -17,10 +17,20 @@
 
 
 <ion-content padding>
-	
+
+	<!-- <div>{{mensaje}}</div> -->
+	<div *ngIf="cargar" style="text-align: center">    
+    	<ion-spinner name="circles"></ion-spinner><br>
+    	<b>Guardando...</b>
+  	</div>
+	<ion-fab top right>
+   		<button ion-fab color="dark" (click)="cambiarImagen()"><ion-icon name="create"></ion-icon></button>
+ 	</ion-fab>
+
 	 <ion-list>
+
 	    <ion-item>
-			<img [src]="user.image" alt="Sin imagen">
+			<div style="width: 100%;text-align: center;"><img [src]="user.image" alt="Sin imagen" height="250px"></div>
 		</ion-item>
 		<ion-item>		
 	        <ion-input type="text"  [(ngModel)]="user.name" name='name' [readonly]="true"></ion-input>

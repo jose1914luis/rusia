@@ -12,6 +12,7 @@ import { Nav, Platform } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { HomePage } from '../pages/home/home';
+import { ListPage } from '../pages/list/list';
 import { ProximoPage } from '../pages/proximo/proximo';
 import { PuntoPage } from '../pages/punto/punto';
 import { MapaPage } from '../pages/mapa/mapa';
@@ -24,7 +25,8 @@ var MyApp = /** @class */ (function () {
         this.platform = platform;
         this.statusBar = statusBar;
         this.splashScreen = splashScreen;
-        this.rootPage = HomePage;
+        //rootPage: any = HomePage;
+        this.rootPage = ListPage;
         this.initializeApp();
         // used for an example of ngFor and navigation
         this.pages = [
@@ -34,7 +36,7 @@ var MyApp = /** @class */ (function () {
             { title: 'Mapas', component: MapaPage },
             { title: 'Promociones', component: PromocionPage },
             { title: 'Preguntas F.A.Q.', component: FaqPage },
-            { title: 'Contactenos', component: ContactoPage },
+            { title: 'Contacto', component: ContactoPage },
             { title: 'Mi perfil', component: PerfilPage }
         ];
     }

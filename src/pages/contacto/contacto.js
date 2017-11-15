@@ -9,20 +9,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+//import {  } from '@ionic-native';
 /**
  * Generated class for the ContactoPage page.
  *
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
  */
+/*declare var cordova: any;*/
 var ContactoPage = /** @class */ (function () {
     function ContactoPage(navCtrl, navParams) {
         this.navCtrl = navCtrl;
         this.navParams = navParams;
+        this.mail = { para: 'tourgratisrusia@gmail.com', asunto: '', mensaje: '' };
     }
-    ContactoPage.prototype.ionViewDidLoad = function () {
-        console.log('ionViewDidLoad ContactoPage');
-    };
     ContactoPage = __decorate([
         IonicPage(),
         Component({

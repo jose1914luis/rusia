@@ -25,9 +25,18 @@
 
   
   <ion-slides pager=true zoom="true">
-    <ion-slide *ngFor="let item of items;">      
-      <a>{{item.name}}</a><br>
-      <img [src]="item.mapa2" alt="Sin mapa">
+    <ion-slide *ngFor="let item of items;">  
+
+      <ion-card>
+
+        <img [src]="item.mapa2" alt="Sin mapa">
+
+        <ion-item>
+          <ion-icon name="pin" item-start large></ion-icon>
+          <h1>{{item.name}}</h1>
+        </ion-item>
+
+      </ion-card>
     </ion-slide>
   </ion-slides>
 
