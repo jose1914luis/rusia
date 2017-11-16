@@ -32,7 +32,8 @@ export class ListPage {
       this.storage.set('tours.guia', null);
       this.storage.set('tours.clientes.faq', null);
       this.storage.set('tours.companies', null);
-      this.storage.set('tours.promociones', null);  
+      this.storage.set('tours.promociones', null);
+      this.storage.set('tours.eventos', null);
     }else{
       this.doLogin(false);
     }   
