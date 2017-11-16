@@ -73,7 +73,7 @@ export class PerfilPage {
      // imageData is either a base64 encoded string or a file URI
      // If it's base64:
       self.cargar = true;
-      let base64Image = 'data:image/jpeg;base64,' + imageData;
+      //let base64Image = 'data:image/jpeg;base64,' + imageData;
       self.user.image = self._DomSanitizer.bypassSecurityTrustResourceUrl('data:image/jpeg;base64, '+ imageData); 
 
       self.storage.get('CONEXION').then((val) => {
@@ -99,6 +99,7 @@ export class PerfilPage {
                   var inParams = [];
                   inParams.push([val.id]); //id to update
                   inParams.push({'image': imageData})
+                  val.image = imageData;
                   var params = [];
                   params.push(inParams);
                   odoo.execute_kw('res.users', 'write', params, function (err, value) {
@@ -109,6 +110,7 @@ export class PerfilPage {
                           'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
                       }
                       self.presentAlert('Alerta!','Se ha actualizado tu imagen de perfil.');
+                      self.storage.set('res.users', val);
                       self.cargar = false;
                   });
                 }

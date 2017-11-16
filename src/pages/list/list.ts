@@ -22,6 +22,7 @@ export class ListPage {
   };  
   cargar = false;
   mensaje = '';
+
   constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, public alertCtrl: AlertController) {
     
     var borrar = this.navParams.get('borrar');
@@ -35,6 +36,7 @@ export class ListPage {
       this.storage.set('tours.promociones', null);
       this.storage.set('tours.eventos', null);
     }else{
+
       this.doLogin(false);
     }   
   }
@@ -100,8 +102,6 @@ export class ListPage {
           var inParams = [];
           inParams.push([['uid', '=', user.id]]);
           inParams.push(['id', 'name', 'uid']); //fields
-          inParams.push(0); //offset
-          inParams.push(5); //limit
           var params = [];
           params.push(inParams);
           odoo.execute_kw('tours.clientes', 'search_read', params, function (err3, value2) {
@@ -118,8 +118,135 @@ export class ListPage {
                 user.cliente_id = value2[key].id;//[value2[key].id, value2[key].name];
               }
 
-              self.storage.set('res.users', user);
-              self.navCtrl.setRoot(HomePage);
+              
+              self.storage.set('res.users', user);//guardo en tabla local
+
+              /***************************************************************************************
+              Guardo el ultimo registro de todas las tablas modificadas
+              ***************************************************************************************/
+              var tablas = [];
+              //consultar modificaciones de tablas
+              var inParams = [];
+              inParams.push([['name', '=', 'tours.guia']]);  
+              inParams.push(['id_modify', 'name', 'action']); //fields    
+              inParams.push(0); //offset
+              inParams.push(1); //limit
+              inParams.push('id_modify desc'); //limit
+              var params = [];  
+              params.push(inParams);        
+              odoo.execute_kw('app.logs', 'search_read', params, function (err4, value3) {
+              if (err3) {
+                self.cargar = false;
+                self.mensaje += JSON.stringify(err4, Object.getOwnPropertyNames(err4))
+                /*return self.presentAlert('Falla!', 
+                  'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );*/
+              }
+              for (var key in value3) { 
+                tablas.push({
+                  name:value3[key].name,
+                  ultimo_id:value3[key].id,
+                  });
+              }
+              var inParams = [];
+              inParams.push([['name', '=', 'tours.clientes.faq']]);  
+              inParams.push(['id_modify', 'name', 'action']); //fields    
+              inParams.push(0); //offset
+              inParams.push(1); //limit
+              inParams.push('id_modify desc'); //limit
+              var params = [];  
+              params.push(inParams);        
+              odoo.execute_kw('app.logs', 'search_read', params, function (err4, value3) {
+                if (err3) {
+                  self.cargar = false;
+                  self.mensaje += JSON.stringify(err4, Object.getOwnPropertyNames(err4))
+                  /*return self.presentAlert('Falla!', 
+                    'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );*/
+                }
+                for (var key in value3) { 
+                  tablas.push({
+                    name:value3[key].name,
+                    ultimo_id:value3[key].id,
+                    });
+                }
+                //self.mensaje += JSON.stringify(value3);
+              var inParams = [];
+              inParams.push([['name', '=', 'tours.companies']]);  
+              inParams.push(['id_modify', 'name', 'action']); //fields    
+              inParams.push(0); //offset
+              inParams.push(1); //limit
+              inParams.push('id_modify desc'); //limit
+              var params = [];  
+              params.push(inParams);        
+              odoo.execute_kw('app.logs', 'search_read', params, function (err4, value3) {
+                if (err3) {
+                  self.cargar = false;
+                  self.mensaje += JSON.stringify(err4, Object.getOwnPropertyNames(err4))
+                  /*return self.presentAlert('Falla!', 
+                    'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );*/
+                }
+                for (var key in value3) { 
+                  tablas.push({
+                    name:value3[key].name,
+                    ultimo_id:value3[key].id,
+                    });
+                }
+
+              var inParams = [];
+              inParams.push([['name', '=', 'tours.promociones']]);  
+              inParams.push(['id_modify', 'name', 'action']); //fields    
+              inParams.push(0); //offset
+              inParams.push(1); //limit
+              inParams.push('id_modify desc'); //limit
+              var params = [];  
+              params.push(inParams);        
+              odoo.execute_kw('app.logs', 'search_read', params, function (err4, value3) {
+                if (err3) {
+                  self.cargar = false;
+                  self.mensaje += JSON.stringify(err4, Object.getOwnPropertyNames(err4))
+                  /*return self.presentAlert('Falla!', 
+                    'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );*/
+                }
+                for (var key in value3) { 
+                  tablas.push({
+                    name:value3[key].name,
+                    ultimo_id:value3[key].id,
+                    });
+                }                
+                //self.mensaje += JSON.stringify(tablas);
+
+                //busco lo ultimo guardado de tablas
+                self.storage.get('tablas').then((val) => {
+                    
+                    if(val != null){
+
+                      for (var key in val) {    
+
+                        for (var key2 in tablas) {  //Resetiar tablas
+                          if(val[key].name == 'tours.guia' && tablas[key2].name == 'tours.guia' && val[key2].ultimo_id < tablas[key2].ultimo_id){
+                            self.storage.set('tours.guia', null);
+                          }
+                          if(val[key].name == 'tours.promociones' && tablas[key2].name == 'tours.promociones' && val[key2].ultimo_id < tablas[key2].ultimo_id){
+                            self.storage.set('tours.promociones', null);
+                          }
+                          if(val[key].name == 'tours.companies' && tablas[key2].name == 'tours.companies' && val[key2].ultimo_id < tablas[key2].ultimo_id){
+                            self.storage.set('tours.companies', null);
+                          }
+                          if(val[key].name == 'tours.clientes.faq' && tablas[key2].name == 'tours.clientes.faq' && val[key2].ultimo_id < tablas[key2].ultimo_id){
+                            self.storage.set('tours.clientes.faq', null);
+                          }
+                        }
+                      }
+                    }
+                    self.storage.set('tablas', tablas);//guardo en tabla local
+                    self.navCtrl.setRoot(HomePage); //-> me voy para la home page
+                });
+                
+              });                
+              });
+              });
+              });
+              /***************************************************************************************/
+              //
               //self.mensaje += JSON.stringify(user);
           });
 

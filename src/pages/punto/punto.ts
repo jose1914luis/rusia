@@ -40,20 +40,20 @@ export class PuntoPage {
             	var params = [];
             	params.push(inParams);
 
-                odoo.execute_kw('tours.companies', 'search_read', params, function (err2, value) {
+              odoo.execute_kw('tours.companies', 'search_read', params, function (err2, value) {
 
-                  if (err2) {            	
-                  	return self.presentAlert('Falla!', 
-                  		'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
-                  }
-                  for (var key in value) {
-                    (value[key]).name = (value[key]).name[1];
-                    (value[key]).punto_encuentro2 = self._DomSanitizer.bypassSecurityTrustResourceUrl('data:image/jpeg;base64, '+(value[key]).punto_encuentro);   
-                    self.items.push((value[key]));
-                  }
-                  self.cargar = false;
-                  self.storage.set('tours.companies', self.items);             	
-                });
+                if (err2) {            	
+                	return self.presentAlert('Falla!', 
+                		'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
+                }
+                for (var key in value) {
+                  (value[key]).name = (value[key]).name[1];
+                  (value[key]).punto_encuentro2 = self._DomSanitizer.bypassSecurityTrustResourceUrl('data:image/jpeg;base64, '+(value[key]).punto_encuentro);   
+                  self.items.push((value[key]));
+                }
+                self.cargar = false;
+                self.storage.set('tours.companies', self.items);             	
+              });
             });
           }else{
 

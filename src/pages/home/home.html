@@ -6,7 +6,7 @@
     <ion-title>Mis Eventos</ion-title>
     <ion-buttons end>
       <button ion-button icon-only (click)="addEvent()">
-        Agregar
+        Nuevo
         <ion-icon name="add"></ion-icon>
       </button>
     </ion-buttons>
@@ -32,6 +32,7 @@
         [noEventsLabel]="calendar.noEventsLabel"          
         (onEventSelected)="onEventSelected($event)"
         (onTitleChanged)="onViewTitleChanged($event)"
+        (onCurrentDateChanged)="onCurrentDateChanged($event)"
         step="30">
   </calendar>
 

@@ -8,6 +8,16 @@
 
   <ion-navbar>
     <ion-title>Evento</ion-title>
+    <!-- <ion-buttons *ngIf="event.home" end>
+      <button ion-button (click)="cancelar()">
+        Cancelar
+        <ion-icon name="trash"></ion-icon>
+      </button>
+      <button ion-button (click)="guardar()">
+        Guardar
+        <ion-icon name="add"></ion-icon>
+      </button>
+    </ion-buttons> -->
   </ion-navbar>
 
 </ion-header>
@@ -46,10 +56,10 @@
   
   <div style="width: 100%; text-align: center;"><h4 *ngIf="event.estado_bol" ion-text color="{{event_color}}">{{event_estado}}</h4></div>
 
-  <button *ngIf="(!event.home && !event.estado_bol)" ion-button block (click)="participar()">Participar en el Tour</button>
+  <button *ngIf="(!event.home)" ion-button block (click)="participar()">Participar en el Tour</button>
 
-<!-- Segment buttons with text -->
-  <ion-segment *ngIf="event.home" color="dark">
+ 
+  <ion-segment *ngIf="nuevo" color="primary">
     <ion-segment-button value="friends" (ionSelect)="cancelar()">
       Cancelar
     </ion-segment-button>

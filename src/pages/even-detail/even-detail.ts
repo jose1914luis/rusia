@@ -20,6 +20,7 @@ export class EvenDetailPage {
   mensaje = '';
   event_estado = '';
   event_color = '';
+  nuevo = false;
   event = {estado_bol:false, estado:null, title:'', startTime:null, endTime:null, allDay: false, description:null, guia: null, ubicacion:null, home:false, tour_id:null}
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, private alertCtrl: AlertController, private storage: Storage) {
   	this.event.title =  this.navParams.get('title');
@@ -45,7 +46,7 @@ export class EvenDetailPage {
       this.event_estado = 'Solicitud Rechazada';
       this.event_color = 'danger';
     }
-
+    this.nuevo =  this.navParams.get('nuevo');
   }
 
   ionViewDidLoad() {

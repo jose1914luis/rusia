@@ -100,7 +100,6 @@ export class ProximoPage {
                     self.cargar = false;       
                     self.calendar.eventSource = events;
                     self.storage.set('tours.guia', events);
-                    //self.mensaje += JSON.stringify(events);
                 });
 
               });

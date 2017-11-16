@@ -28,6 +28,7 @@ export class HomePage {
   mensaje  ='';
   cargar =  true;
   viewTitle = '';
+  fecha = new Date();
   constructor(public navCtrl: NavController, public modalCtrl: ModalController, private alertCtrl: AlertController, private storage: Storage) {
 
     var self = this;
@@ -38,37 +39,39 @@ export class HomePage {
       }else{// se encontraron datos para la conexion 
         self.cargar = true;
         var odoo = new Odoo(val);  
-        self.storage.get('tours.eventos').then((val) => {
+        odoo.connect(function (err) {
+          if (err) { 
+            self.cargar = false;
+            return self.presentAlert('Falla!', 
+              'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
+          } 
+          //
+          var inParams = [];
+          inParams.push([['id', '<>', '0']]);  
+          inParams.push(['id', 'name', 'tour_id', 'state', 'num_person']); //fields 
+          var params = [];
+          params.push(inParams);
+          odoo.execute_kw('tours.clientes.solicitudes', 'search_read', params, function (err_s, value_s) {
+
+            if (err_s) {
+              self.cargar = false;
+              return self.presentAlert('Falla!', 
+                'Error: '+ JSON.stringify(err_s, Object.getOwnPropertyNames(err_s)) );
+            }
+
+            //self.mensaje += JSON.stringify(value_s);
+            //Traigo todos los eventos proximos
+            var inParams = [];
+            inParams.push([['id', '<>', '0']]);  
+            inParams.push(['id', 'guia_id', 'tour_id','date_begin','date_end']); //fields 
+            var params = [];
+            params.push(inParams);
+
+            //si no han habido cambios se pueden cargar desde memoria local
+            self.storage.get('tours.guia').then((val) => {
          
-          if(val == null){
-                      
-            odoo.connect(function (err) {
-               if (err) { 
-                self.cargar = false;
-                return self.presentAlert('Falla!', 
-                  'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
-              } 
-              //
-              var inParams = [];
-              inParams.push([['id', '<>', '0']]);  
-              inParams.push(['id', 'name', 'tour_id', 'state', 'num_person']); //fields 
-              var params = [];
-              params.push(inParams);
-              odoo.execute_kw('tours.clientes.solicitudes', 'search_read', params, function (err_s, value_s) {
+              if(val == null){
 
-                if (err_s) {
-                  self.cargar = false;
-                  return self.presentAlert('Falla!', 
-                    'Error: '+ JSON.stringify(err_s, Object.getOwnPropertyNames(err_s)) );
-                }
-
-                //self.mensaje += JSON.stringify(value_s);
-                //Traigo todos los eventos proximos
-                var inParams = [];
-                inParams.push([['id', '<>', '0']]);  
-                inParams.push(['id', 'guia_id', 'tour_id','date_begin','date_end']); //fields 
-                var params = [];
-                params.push(inParams);
                 odoo.execute_kw('tours.guia', 'search_read', params, function (err2, value) {
 
                   if (err2) {
@@ -84,79 +87,148 @@ export class HomePage {
                   var params = [];
                   params.push(inParams);                                
                   odoo.execute_kw('tours', 'search_read', params, function (err3, value2) {
-                      if (err3) {         
-                        return self.presentAlert('Falla!', 
-                          'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );
+                    if (err3) {         
+                      return self.presentAlert('Falla!', 
+                        'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );
+                    }
+                    
+                    var events = []; 
+
+                    for(var key_s in value_s){                    
+
+                      for (var key in value) {                  
+                        if(value_s[key_s].tour_id[0] == value[key].id ){
+
+                          var dateStart = new Date((value[key]).date_begin);
+                          var dateEnd = new Date((value[key]).date_end);                    
+                          var startTime = new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate(), dateStart.getHours(), dateStart.getMinutes());
+                          var endTime = new Date(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate() , dateEnd.getHours(), dateEnd.getMinutes());
+                          for (var key2 in value2){
+                            if(value2[key2].id == (value[key]).tour_id[0]){
+                              events.push({
+                                title: (value2[key2]).name,
+                                startTime: startTime,
+                                endTime: endTime,
+                                allDay: false,
+                                description: (value2[key2]).description,
+                                guia: (value[key]).guia_id[1],
+                                ubicacion: (value2[key2]).company_id[1],
+                                estado: value_s[key_s].state,
+                                tour_id:value[key].id,
+                                home:false
+                              });            
+                              break;
+                            }
+                          }                         
+                        }                      
+                      } 
+                    }
+                    self.storage.get('tours.eventos').then((val) => {
+     
+                      //si existen eventos del home los agrego al array principal
+                      if(val != null){
+                        
+                        for (var key in val) {            
+                          if((val[key]).home == true){
+                              events.push({
+                              title: (val[key]).title,
+                              startTime: new Date((val[key]).startTime),
+                              endTime: new Date((val[key]).endTime),
+                              allDay: false,
+                              description: (val[key]).description,
+                              guia: (val[key]).guia,
+                              ubicacion: (val[key]).ubicacion,
+                              estado: (val[key]).estado,
+                              home: (val[key]).home
+                            });  
+                          }                                   
+                        }                                                    
                       }
-                      
-                      var events = []; 
-
-                      for(var key_s in value_s){                    
-
-                        for (var key in value) {                  
-                          if(value_s[key_s].tour_id[0] == value[key].id ){
-
-                            var dateStart = new Date((value[key]).date_begin);
-                            var dateEnd = new Date((value[key]).date_end);                    
-                            var startTime = new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate(), dateStart.getHours(), dateStart.getMinutes());
-                            var endTime = new Date(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate() , dateEnd.getHours(), dateEnd.getMinutes());
-                            for (var key2 in value2){
-                              if(value2[key2].id == (value[key]).tour_id[0]){
-                                events.push({
-                                  title: (value2[key2]).name,
-                                  startTime: startTime,
-                                  endTime: endTime,
-                                  allDay: false,
-                                  description: (value2[key2]).description,
-                                  guia: (value[key]).guia_id[1],
-                                  ubicacion: (value2[key2]).company_id[1],
-                                  estado: value_s[key_s].state
-                                });            
-                                break;
-                              }
-                            }                         
-                          }                      
-                        } 
-                      }
-                            
-                      self.cargar = false;       
-                      self.calendar.eventSource = events;
+                      self.cargar = false; 
+                      self.calendar.eventSource = events;                                            
                       self.storage.set('tours.eventos', events);
-                      
-                  });
+                    });
 
+                  });//odoo.execute_kw('tours'
+
+                });//odoo.execute_kw('tours.guia'
+
+              }else{
+
+                //self.mensaje += 'entro';
+                var events = []; 
+                //var events = []; 
+
+
+                for(var key_s in value_s){   
+
+                    for (var key in val) {                  
+
+                      if(value_s[key_s].tour_id[0] == val[key].tour_id ){
+
+                          //self.mensaje += 'entro_ una';
+                          events.push({
+                            title: (val[key]).title,
+                            startTime: new Date((val[key]).startTime),
+                            endTime: new Date((val[key]).endTime),
+                            allDay: false,
+                            description: (val[key]).description,
+                            guia: (val[key]).guia,
+                            ubicacion: (val[key]).ubicacion,
+                            tour_id: (val[key]).tour_id,
+                            estado: value_s[key_s].state,
+                            home: false
+                          });
+                      }                         
+                    }                                        
+                }
+
+                 //traigo todos los eventos guardados 
+                self.storage.get('tours.eventos').then((val2) => {
+ 
+                  //si existen eventos del home los agrego al array principal
+                  if(val2 != null){
+                    
+                    for (var key2 in val2) {            
+                      if((val2[key2]).home == true){
+                          events.push({
+                          title: (val2[key2]).title,
+                          startTime: new Date((val2[key2]).startTime),
+                          endTime: new Date((val2[key2]).endTime),
+                          allDay: false,
+                          description: (val2[key2]).description,
+                          guia: (val2[key2]).guia,
+                          ubicacion: (val2[key2]).ubicacion,
+                          estado: (val2[key2]).estado,
+                          home: (val2[key2]).home
+                        });  
+                      }                                   
+                    }                                                    
+                  }
+                  self.cargar = false; 
+                  self.calendar.eventSource = events;                                            
+                  self.storage.set('tours.eventos', events);
                 });
 
-              });
-            });
 
-          }else{
+              }//else
 
-            var events = []; 
-            for (var key in val) {            
-              events.push({
-                title: (val[key]).title,
-                startTime: new Date((val[key]).startTime),
-                endTime: new Date((val[key]).endTime),
-                allDay: false,
-                description: (val[key]).description,
-                guia: (val[key]).guia,
-                ubicacion: (val[key]).ubicacion,
-                estado: (val[key]).estado
-              });         
-            }       
-            self.cargar = false;       
-            self.calendar.eventSource = events;
-          }
-        });
-        
+            });//self.storage.get('tours.guia')
+          
+          });// odoo.execute_kw('tours.clientes.solicitudes'      
+
+        });//odoo.connect(function (err) {
       }
     });
   }  
 
+  onCurrentDateChanged(event:Date){
+    this.fecha = event;
+  }
+
   addEvent(){
 
-  	let modal = this.modalCtrl.create(EvenDetailPage, {startTime: new Date(), endTime:new Date(), home:true});
+  	let modal = this.modalCtrl.create(EvenDetailPage, {startTime: new Date(this.fecha), endTime:new Date(this.fecha), home:true, nuevo:true});
     modal.present();
     modal.onDidDismiss(data => {
       if (data) {
@@ -196,7 +268,7 @@ export class HomePage {
       description: evt.description,
       guia:evt.guia,
       ubicacion:evt.ubicacion,
-      home:false,
+      home:true,
       estado:evt.estado
     });
   }
