@@ -21,7 +21,8 @@ export class EvenDetailPage {
   event_estado = '';
   event_color = '';
   nuevo = false;
-  event = {estado_bol:false, estado:null, title:'', startTime:null, endTime:null, allDay: false, description:null, guia: null, ubicacion:null, home:false, tour_id:null}
+  editable = true;
+  event = {estado_bol:false, estado:null, title:'', startTime:null, num_person: 0, endTime:null, allDay: false, description:null, guia: null, ubicacion:null, home:false, tour_id:null}
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, private alertCtrl: AlertController, private storage: Storage) {
   	this.event.title =  this.navParams.get('title');
   	this.event.startTime =  this.navParams.get('startTime').toISOString();
@@ -29,22 +30,26 @@ export class EvenDetailPage {
   	this.event.description =  this.navParams.get('description');
   	this.event.guia =  this.navParams.get('guia');
   	this.event.ubicacion =  this.navParams.get('ubicacion');
-    this.event.home =  this.navParams.get('home');  	
+    this.event.home =  this.navParams.get('home'); 
+    this.editable = this.navParams.get('editable');
     this.event.tour_id =  this.navParams.get('tour_id');
     this.event.estado =  this.navParams.get('estado');
-    if(this.event.estado == 'borrador'){
+    if(this.event.estado == 'borrador' || this.event.estado == 'pendiente'){
       this.event.estado_bol = true;
       this.event_estado = 'Esperando aceptación de solicitud';
       this.event_color = 'danger';
+      this.event.home = true;
     }else if(this.event.estado == 'aceptado'){
 
       this.event.estado_bol = true;
       this.event_estado = 'Solicitud Aceptada';
       this.event_color = 'secondary';
+      this.event.home = true;
     }else if(this.event.estado == 'rechazado'){
       this.event.estado_bol = true;
       this.event_estado = 'Solicitud Rechazada';
       this.event_color = 'danger';
+      this.event.home = true;
     }
     this.nuevo =  this.navParams.get('nuevo');
   }
@@ -84,7 +89,23 @@ export class EvenDetailPage {
     this.viewCtrl.dismiss(this.event);
   }
 
+  encolarRegistros(num_person){
+    
+    var self = this;
+    self.event.estado_bol = true;
+    self.event_estado = 'Esperando aceptación de solicitud';
+    self.event_color = 'danger';
+    self.event.home = false;
+    self.event.estado = 'pendiente';
+    self.event.num_person = num_person;
+    self.presentAlert('Alerta!','Has solicitado participar en este tour:<br><b>Estado: Pendiente</b>');    
+    this.viewCtrl.dismiss(this.event);
+        
+    
+  }
+
   presentPrompt() {
+    var self = this;
     let alert = this.alertCtrl.create({
       title: 'Asistencia',
       inputs: [
@@ -105,8 +126,7 @@ export class EvenDetailPage {
         {
           text: 'Continuar',
           handler: data => {
-
-            var self = this;
+            
             //self.mensaje += 'esta entrando';
             self.storage.get('CONEXION').then((val) => {
               //self.mensaje += 'esta2';
@@ -118,8 +138,7 @@ export class EvenDetailPage {
                   //self.mensaje += 'esta3';
                     if (err) { 
 
-                      return self.presentAlert('Falla!', 
-                        'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
+                      return self.encolarRegistros(data.num_person);
                     }
                     self.storage.get('res.users').then((val) => {
                       //self.mensaje += 'esta5';
@@ -146,10 +165,19 @@ export class EvenDetailPage {
                           //self.mensaje += 'Entro hasta el ultimo';
                             if (err) { 
 
-                              return self.presentAlert('Falla!', 
-                                'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
+                              return self.encolarRegistros(data.num_person);
                             }
-                            self.presentAlert('Alerta!','Has solicitado participar en este tour:<br><b>Estado: Pendiente</b>');
+                            //var self = this;
+                            self.event.estado_bol = true;
+                            self.event_estado = 'Esperando aceptación de solicitud';
+                            self.event_color = 'danger';
+                            self.event.home = false;
+                            self.event.estado = 'borrador';
+                            self.event.num_person = data.num_person;
+                            self.presentAlert('Alerta!','Has solicitado participar en este tour:<br><b>Estado: Pendiente</b>');    
+                            self.viewCtrl.dismiss(self.event);
+
+                            //self.presentAlert('Alerta!','Has solicitado participar en este tour:<br><b>Estado: Pendiente</b>');
                         });
                       }
                   });

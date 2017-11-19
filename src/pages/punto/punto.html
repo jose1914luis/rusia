@@ -17,11 +17,11 @@
 
 
 
-<ion-content padding>
+<ion-content>
 
   <div *ngIf="cargar" style="text-align: center">    
     <ion-spinner name="circles"></ion-spinner><br>
-    <b>Cargando...</b>
+    <b>Cargando Imagenes...</b>
   </div>
 
   
@@ -29,7 +29,7 @@
     <ion-slide *ngFor="let item of items;" (ionSlideDidChange)="slideChanged()">      
       <ion-card>
 
-        <img [src]="item.punto_encuentro2" alt="Sin mapa">
+        <img [src]="item.punto_encuentro2" (click)="zoomImage(item.mapa)" alt="Sin mapa">
 
         <ion-item>
           <ion-icon name="pin" item-start large></ion-icon>

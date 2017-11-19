@@ -4,6 +4,8 @@ import  * as Odoo from 'odoo-xmlrpc';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Storage } from '@ionic/storage';
 import { ListPage } from '../../pages/list/list';
+import { PhotoViewer } from '@ionic-native/photo-viewer';
+import { Base64ToGallery } from '@ionic-native/base64-to-gallery';
 
 
 @IonicPage()
@@ -16,7 +18,7 @@ export class PuntoPage {
   
   items = [];
   cargar = true;
-  constructor(public navCtrl: NavController, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
+  constructor(private photoViewer: PhotoViewer, private base64ToGallery: Base64ToGallery, public navCtrl: NavController, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
   	
   	var self = this;
     self.items  = [];  
@@ -31,8 +33,8 @@ export class PuntoPage {
           	odoo.connect(function (err) {
         	    if (err) { 
         	    	
-        	    	return self.presentAlert('Falla!', 
-        	    		'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
+        	    	self.cargar = false;        
+                self.presentAlert('Falla!', 'Imposible conectarse' );
         	    }	    
         	    var inParams = [];
             	inParams.push([['id', '<>', '0']]);  
@@ -43,8 +45,8 @@ export class PuntoPage {
               odoo.execute_kw('tours.companies', 'search_read', params, function (err2, value) {
 
                 if (err2) {            	
-                	return self.presentAlert('Falla!', 
-                		'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
+                	self.cargar = false;        
+                  self.presentAlert('Falla!', 'Imposible conectarse' );
                 }
                 for (var key in value) {
                   (value[key]).name = (value[key]).name[1];
@@ -68,11 +70,24 @@ export class PuntoPage {
     });  
   }
 
+  zoomImage(imageData) {
+
+      var self = this;
+      this.base64ToGallery.base64ToGallery(imageData, { prefix: '_img' }).then(
+        res => {
+          self.photoViewer.show(res);
+        },
+        err => {
+          self.presentAlert('Falla','Error al cargar la imagen.');
+        }
+      );
+  }
+
   ionViewDidLoad() {
     console.log('ionViewDidLoad PuntoPage');
   }
 
-presentAlert(titulo, texto) {
+  presentAlert(titulo, texto) {
     const alert = this.alertCtrl.create({
       title: titulo,
       subTitle: texto,

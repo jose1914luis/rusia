@@ -1,9 +1,12 @@
-import { Component } from '@angular/core';
 import { NavController, NavParams, AlertController } from 'ionic-angular';
+import { Component } from '@angular/core';
+import { Network } from '@ionic-native/network';
 import { Storage } from '@ionic/storage';
 import { HomePage } from '../../pages/home/home';
-import  * as Odoo from 'odoo-xmlrpc';
 import { CrearCuentaPage } from '../../pages/crear-cuenta/crear-cuenta';
+import  * as Odoo from 'odoo-xmlrpc';
+
+//import { Observable } from 'rxjs/Rx';
 
 @Component({
   selector: 'page-list',
@@ -17,17 +20,18 @@ export class ListPage {
     url: 'http://moscutourgratis.com',
     port: '8069',
     db: 'Tour_Gratis_Rusia',
-    username: '',//username: 'fernandez.bermudez.jonatan@gmail.com'
-    password: '',//password: '123456',    
+    username: '',
+    password: '',
   };  
-  cargar = false;
+  cargar = true;
   mensaje = '';
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, public alertCtrl: AlertController) {
-    
-    var borrar = this.navParams.get('borrar');
+  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, public alertCtrl: AlertController, private network: Network) {       
+
+    var borrar = this.navParams.get('borrar');    
     this.CONEXION.username = this.navParams.get('login');
     if(borrar == true){
+      this.cargar = false;
       this.storage.set('CONEXION', null);
       this.storage.set('res.users', null);
       this.storage.set('tours.guia', null);
@@ -37,184 +41,181 @@ export class ListPage {
       this.storage.set('tours.eventos', null);
     }else{
 
-      this.doLogin(false);
-    }   
+      this.conectarApp(false);
+    }     
   }
 
-  doLogin(verificar){
+  loginSinDatos(){
+    var self = this;
+    this.storage.get('res.users').then((val) => {
+       if(val == null){//no existe datos
+         
+         self.presentAlert('Falla!', 'Imposible conectarse' );
+       }else{
+         
+         self.navCtrl.setRoot(HomePage);
+       }
+       self.cargar = false;
+    });
+  } 
+   
+  conectarApp(verificar){
 
     var self = this;
-    this.storage.get('CONEXION').then((val) => {
-      var con;
-      if(val == null){//no existe datos
-        //verifico que ingrese los datos
-        con = this.CONEXION
-
-        if(con.username.length < 3 || con.password.length < 3){
-
-          if(verificar){
-            self.presentAlert('Alerta!','Por favor ingrese usuario y contraseña');  
-          }          
-          return;
-        }
-      }else{                
-        //si los trae directamente ya fueron verificados
-        con = val;
-      }
+    
+    if(this.network.type.toLowerCase() == 'unknown' || this.network.type.toLowerCase() == 'none'){// no hay conexion
       self.cargar = true;
-      var odoo = new Odoo(con);
-      odoo.connect(function (err) {  
-        //self.mensaje = JSON.stringify(valuepru);
-        if (err) { 
+      this.loginSinDatos();
+    }else{
+
+      this.storage.get('CONEXION').then((val) => {
+        var con;
+        if(val == null){//no existe datos         
           self.cargar = false;
-          return self.presentAlert('Falla!', 
-            'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
-        }      
-        var inParams = [];
-        inParams.push([['login', '=', con.username]]);  
-        inParams.push(['id', 'login', 'user_email', 'image', 'name']); //fields 
-        var params = [];
-        params.push(inParams);
-        odoo.execute_kw('res.users', 'search_read', params, function (err2, value) {
+          con = this.CONEXION;
+          if(con.username.length < 3 || con.password.length < 3){
 
-          if (err2) {
-            self.cargar = false;
-            return self.presentAlert('Falla!', 
-              'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
+            if(verificar){
+              self.presentAlert('Alerta!','Por favor ingrese usuario y contraseña');  
+            }          
+            return;
           }
 
-          var user = {id:null,name:null,image:null,login:null,cliente_id:null};
-          for (var key in value) {     
-            if(value[key].login == con.username || value[key].user_email == con.username){
-
-              self.storage.set('CONEXION', con);
-              user.id = value[key].id;
-              user.name = value[key].name;
-              user.image = value[key].image;
-              user.login = value[key].login;              
-              /*
-              id= value[key].id;*/
-              break;
-              //self.navCtrl.setRoot(HomePage);              
-            }
+        }else{                
+          //si los trae directamente ya fueron verificados
+          con = val;
+          if(con.username.length < 3 || con.password.length < 3){    
+            return self.cargar = false;
           }
-//self.mensaje += 'entro';
+        }
+        self.cargar = true;
+        var odoo = new Odoo(con);
+        odoo.connect(function (err) {
+          //self.mensaje += 'entro';
+          if (err) { 
+            return self.loginSinDatos();
+          }      
           var inParams = [];
-          inParams.push([['uid', '=', user.id]]);
-          inParams.push(['id', 'name', 'uid']); //fields
+          inParams.push([['login', '=', con.username]]);  
+          inParams.push(['id', 'login', 'user_email', 'image', 'name']); //fields 
           var params = [];
           params.push(inParams);
-          odoo.execute_kw('tours.clientes', 'search_read', params, function (err3, value2) {
-            //self.mensaje += 'entro';
-              if (err3) {
-                self.cargar = false;
-                return self.presentAlert('Falla!', 
-                  'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );
-              }
+          odoo.execute_kw('res.users', 'search_read', params, function (err, value) {
 
-              
-              //self.mensaje += JSON.stringify(value2);
-              for (var key in value2) {
-                user.cliente_id = value2[key].id;//[value2[key].id, value2[key].name];
-              }
+            if (err) {
+              return self.loginSinDatos();
+            }
+            var user = {id:null,name:null,image:null,login:null,cliente_id:null};
+            //self.mensaje += JSON.stringify(value);
+            if(value.length > 0){
 
-              
-              self.storage.set('res.users', user);//guardo en tabla local
+               self.storage.set('CONEXION', con);
+               user.id = value[0].id;
+               user.name = value[0].name;
+               user.image = value[0].image;
+               user.login = value[0].login; 
+            }else{
+              self.cargar = false;
+              return self.presentAlert('Falla!', 'Usuario incorrecto' );
+            }
+                        
 
-              /***************************************************************************************
-              Guardo el ultimo registro de todas las tablas modificadas
-              ***************************************************************************************/
-              var tablas = [];
-              //consultar modificaciones de tablas
-              var inParams = [];
-              inParams.push([['name', '=', 'tours.guia']]);  
-              inParams.push(['id_modify', 'name', 'action']); //fields    
-              inParams.push(0); //offset
-              inParams.push(1); //limit
-              inParams.push('id_modify desc'); //limit
-              var params = [];  
-              params.push(inParams);        
-              odoo.execute_kw('app.logs', 'search_read', params, function (err4, value3) {
-              if (err3) {
-                self.cargar = false;
-                self.mensaje += JSON.stringify(err4, Object.getOwnPropertyNames(err4))
-                /*return self.presentAlert('Falla!', 
-                  'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );*/
-              }
-              for (var key in value3) { 
-                tablas.push({
-                  name:value3[key].name,
-                  ultimo_id:value3[key].id,
-                  });
-              }
-              var inParams = [];
-              inParams.push([['name', '=', 'tours.clientes.faq']]);  
-              inParams.push(['id_modify', 'name', 'action']); //fields    
-              inParams.push(0); //offset
-              inParams.push(1); //limit
-              inParams.push('id_modify desc'); //limit
-              var params = [];  
-              params.push(inParams);        
-              odoo.execute_kw('app.logs', 'search_read', params, function (err4, value3) {
-                if (err3) {
+            var inParams = [];
+            inParams.push([['uid', '=', user.id]]);
+            inParams.push(['id', 'name', 'uid']); //fields
+            var params = [];
+            params.push(inParams);
+            odoo.execute_kw('tours.clientes', 'search_read', params, function (err, value2) {
+              //self.mensaje += 'entro';
+                if (err) {
+                  return self.loginSinDatos();
+                }
+                
+                if(value2.length > 0){
+                  user.cliente_id = value2[0].id;
+                }else{
                   self.cargar = false;
-                  self.mensaje += JSON.stringify(err4, Object.getOwnPropertyNames(err4))
-                  /*return self.presentAlert('Falla!', 
-                    'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );*/
-                }
-                for (var key in value3) { 
-                  tablas.push({
-                    name:value3[key].name,
-                    ultimo_id:value3[key].id,
-                    });
-                }
-                //self.mensaje += JSON.stringify(value3);
-              var inParams = [];
-              inParams.push([['name', '=', 'tours.companies']]);  
-              inParams.push(['id_modify', 'name', 'action']); //fields    
-              inParams.push(0); //offset
-              inParams.push(1); //limit
-              inParams.push('id_modify desc'); //limit
-              var params = [];  
-              params.push(inParams);        
-              odoo.execute_kw('app.logs', 'search_read', params, function (err4, value3) {
-                if (err3) {
-                  self.cargar = false;
-                  self.mensaje += JSON.stringify(err4, Object.getOwnPropertyNames(err4))
-                  /*return self.presentAlert('Falla!', 
-                    'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );*/
-                }
-                for (var key in value3) { 
-                  tablas.push({
-                    name:value3[key].name,
-                    ultimo_id:value3[key].id,
-                    });
-                }
-
-              var inParams = [];
-              inParams.push([['name', '=', 'tours.promociones']]);  
-              inParams.push(['id_modify', 'name', 'action']); //fields    
-              inParams.push(0); //offset
-              inParams.push(1); //limit
-              inParams.push('id_modify desc'); //limit
-              var params = [];  
-              params.push(inParams);        
-              odoo.execute_kw('app.logs', 'search_read', params, function (err4, value3) {
-                if (err3) {
-                  self.cargar = false;
-                  self.mensaje += JSON.stringify(err4, Object.getOwnPropertyNames(err4))
-                  /*return self.presentAlert('Falla!', 
-                    'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );*/
-                }
-                for (var key in value3) { 
-                  tablas.push({
-                    name:value3[key].name,
-                    ultimo_id:value3[key].id,
-                    });
+                  return self.presentAlert('Falla!', 'Usuario incorrecto' );
                 }                
-                //self.mensaje += JSON.stringify(tablas);
 
-                //busco lo ultimo guardado de tablas
+                self.storage.set('res.users', user);//guardo en tabla local
+                /***************************************************************************************
+                Guardo el ultimo registro de todas las tablas modificadas
+                **************************************************************************************/
+                var tablas = [];
+                //consultar modificaciones de tablas
+                var inParams = [];
+                inParams.push([['name', '=', 'tours.guia']]);  
+                inParams.push(['id_modify', 'name', 'action']); //fields    
+                inParams.push(0); //offset
+                inParams.push(1); //limit
+                inParams.push('id_modify desc'); //limit
+                var params = [];  
+                params.push(inParams);        
+                odoo.execute_kw('app.logs', 'search_read', params, function (err, value3) {
+                if (err) {
+                  return self.loginSinDatos();
+                }
+                if(value3.length > 0){
+                  tablas.push({name:value3[0].name, ultimo_id:value3[0].id});
+                }
+
+                var inParams = [];
+                inParams.push([['name', '=', 'tours.clientes.faq']]);  
+                inParams.push(['id_modify', 'name', 'action']); //fields    
+                inParams.push(0); //offset
+                inParams.push(1); //limit
+                inParams.push('id_modify desc'); //limit
+                var params = [];  
+                params.push(inParams);        
+                odoo.execute_kw('app.logs', 'search_read', params, function (err, value3) {
+                 
+                if (err) {
+                  return self.loginSinDatos();
+                }
+
+                if(value3.length > 0){
+                  tablas.push({name:value3[0].name, ultimo_id:value3[0].id});
+                }
+                  //self.mensaje += JSON.stringify(value3);
+                var inParams = [];
+                inParams.push([['name', '=', 'tours.companies']]);  
+                inParams.push(['id_modify', 'name', 'action']); //fields    
+                inParams.push(0); //offset
+                inParams.push(1); //limit
+                inParams.push('id_modify desc'); //limit
+                var params = [];  
+                params.push(inParams);        
+                odoo.execute_kw('app.logs', 'search_read', params, function (err, value3) {
+                
+                if (err) {
+                  return self.loginSinDatos();
+                }
+
+                if(value3.length > 0){
+                  tablas.push({name:value3[0].name, ultimo_id:value3[0].id});
+                }
+
+                var inParams = [];
+                inParams.push([['name', '=', 'tours.promociones']]);  
+                inParams.push(['id_modify', 'name', 'action']); //fields    
+                inParams.push(0); //offset
+                inParams.push(1); //limit
+                inParams.push('id_modify desc'); //limit
+                var params = [];  
+                params.push(inParams);        
+                odoo.execute_kw('app.logs', 'search_read', params, function (err, value3) {
+                
+                if (err) {
+                  return self.loginSinDatos();
+                }
+
+                if(value3.length > 0){
+                  tablas.push({name:value3[0].name, ultimo_id:value3[0].id});
+                }              
+                  //self.mensaje += JSON.stringify(tablas);
+
+                  //busco lo ultimo guardado de tablas
                 self.storage.get('tablas').then((val) => {
                     
                     if(val != null){
@@ -239,22 +240,18 @@ export class ListPage {
                     }
                     self.storage.set('tablas', tablas);//guardo en tabla local
                     self.navCtrl.setRoot(HomePage); //-> me voy para la home page
+                });                  
+                });                
                 });
-                
-              });                
-              });
-              });
-              });
-              /***************************************************************************************/
-              //
-              //self.mensaje += JSON.stringify(user);
+                });
+                });
+                /**************************************************************************************/                  
+            });            
           });
-
-          
-        });
-      });    
-    });
-    /*this.navCtrl.setRoot(HomePage);*/
+        });    
+      });
+    }
+    
   }
 
   presentAlert(titulo, texto) {
@@ -268,5 +265,7 @@ export class ListPage {
   crearCuenta(){
     this.navCtrl.push(CrearCuentaPage);
   }
+
+  
 
 }

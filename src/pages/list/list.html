@@ -1,10 +1,10 @@
 <ion-content>  
-   <form (ngSubmit)="doLogin(true)">
+   <form (ngSubmit)="this.conectarApp(true)">
 
     <div>{{mensaje}}</div>
     
     <div style="text-align: center">
-        <img src="assets/imgs/icon.png?v=1" alt="ToursGratisRusia"/>                
+        <img src="assets/imgs/icon.png?v=1" alt="ToursGratisRusia"/>                        
     </div> 
 
     <ion-list *ngIf="!cargar">

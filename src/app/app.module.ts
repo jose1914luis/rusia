@@ -22,9 +22,9 @@ import { NgCalendarModule  } from 'ionic2-calendar';
 import { HttpModule } from '@angular/http';
 import { IonicStorageModule } from '@ionic/storage';
 import { Camera } from '@ionic-native/camera';
-
-
-
+import { Network } from '@ionic-native/network';
+import { PhotoViewer } from '@ionic-native/photo-viewer';
+import { Base64ToGallery } from '@ionic-native/base64-to-gallery';
 
 @NgModule({
   declarations: [
@@ -47,7 +47,7 @@ import { Camera } from '@ionic-native/camera';
     HttpModule,
     NgCalendarModule,
     IonicModule.forRoot(MyApp),
-    IonicStorageModule.forRoot()
+    IonicStorageModule.forRoot()    
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -66,7 +66,10 @@ import { Camera } from '@ionic-native/camera';
     CrearCuentaPage
   ],
   providers: [
+    Base64ToGallery,    
     Camera,
+    Network,
+    PhotoViewer,
     StatusBar,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler}

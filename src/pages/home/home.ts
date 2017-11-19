@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
 import { NavController, ModalController, AlertController } from 'ionic-angular';
+import { Component } from '@angular/core';
+import { Network } from '@ionic-native/network';
 import { Storage } from '@ionic/storage';
 import { ListPage } from '../../pages/list/list';
-import  * as Odoo from 'odoo-xmlrpc';
 import { EvenDetailPage } from '../even-detail/even-detail';
-
+import  * as Odoo from 'odoo-xmlrpc';
 
 @Component({
   selector: 'page-home',
@@ -29,145 +29,165 @@ export class HomePage {
   cargar =  true;
   viewTitle = '';
   fecha = new Date();
-  constructor(public navCtrl: NavController, public modalCtrl: ModalController, private alertCtrl: AlertController, private storage: Storage) {
-
+  constructor(private network: Network, public navCtrl: NavController, public modalCtrl: ModalController, private alertCtrl: AlertController, private storage: Storage) {
+    //this.homeSinDatos();
     var self = this;
-    this.storage.get('CONEXION').then((val) => {
-      
-      if(val == null){
-        self.navCtrl.setRoot(ListPage,{borrar: true, login:null});
-      }else{// se encontraron datos para la conexion 
-        self.cargar = true;
-        var odoo = new Odoo(val);  
-        odoo.connect(function (err) {
-          if (err) { 
-            self.cargar = false;
-            return self.presentAlert('Falla!', 
-              'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
-          } 
-          //
-          var inParams = [];
-          inParams.push([['id', '<>', '0']]);  
-          inParams.push(['id', 'name', 'tour_id', 'state', 'num_person']); //fields 
-          var params = [];
-          params.push(inParams);
-          odoo.execute_kw('tours.clientes.solicitudes', 'search_read', params, function (err_s, value_s) {
 
-            if (err_s) {
+    if(this.network.type.toLowerCase() == 'unknown' || this.network.type.toLowerCase() == 'none'){// no hay conexion
+      self.cargar = true;
+       this.homeSinDatos();
+    }else{
+
+      this.storage.get('CONEXION').then((val) => {      
+        if(val == null){
+          self.navCtrl.setRoot(ListPage,{borrar: true, login:null});
+        }else{// se encontraron datos para la conexion 
+          self.cargar = true;
+          var odoo = new Odoo(val);  
+          odoo.connect(function (err) {
+            if (err) { 
               self.cargar = false;
-              return self.presentAlert('Falla!', 
-                'Error: '+ JSON.stringify(err_s, Object.getOwnPropertyNames(err_s)) );
-            }
+              return self.homeSinDatos();
+            } 
+            //Si estoy conectado debo primero actualizar las solicitudes
+            self.storage.get('tours.eventos').then((val) => {
+              //self.mensaje += '1';
+              let tabla_eventos_local = val;
+              //self.mensaje += 'tabla_eventos_local:'+ JSON.stringify(tabla_eventos_local);
+              let events = [];            
 
-            //self.mensaje += JSON.stringify(value_s);
-            //Traigo todos los eventos proximos
-            var inParams = [];
-            inParams.push([['id', '<>', '0']]);  
-            inParams.push(['id', 'guia_id', 'tour_id','date_begin','date_end']); //fields 
-            var params = [];
-            params.push(inParams);
+              self.storage.get('res.users').then((val) => {
+                //self.mensaje += '2';
+                let usuario = val;
+                var inParams = [];
+                for (var key in tabla_eventos_local) {            
 
-            //si no han habido cambios se pueden cargar desde memoria local
-            self.storage.get('tours.guia').then((val) => {
-         
-              if(val == null){
+                  if((tabla_eventos_local[key]).estado == 'pendiente'){
+                    inParams.push({
+                      name: usuario.cliente_id,
+                      tour_id: (tabla_eventos_local[key]).tour_id,
+                      state: 'borrador',
+                      num_person:(tabla_eventos_local[key]).num_person
+                    });  
+                  }    
 
-                odoo.execute_kw('tours.guia', 'search_read', params, function (err2, value) {
+                  if((tabla_eventos_local[key]).home == true){
+                      events.push({
+                      title: (tabla_eventos_local[key]).title,
+                      startTime: new Date((tabla_eventos_local[key]).startTime),
+                      endTime: new Date((tabla_eventos_local[key]).endTime),
+                      allDay: false,
+                      description: (tabla_eventos_local[key]).description,
+                      guia: (tabla_eventos_local[key]).guia,
+                      ubicacion: (tabla_eventos_local[key]).ubicacion,
+                      estado: (tabla_eventos_local[key]).estado,
+                      home: (tabla_eventos_local[key]).home
+                    });  
+                  }                               
+                }   
+                //self.mensaje += '3';
+                var params = [];
+                params.push(inParams);
+                //self.mensaje += 'Parametros'+ JSON.stringify(inParams);
+                odoo.execute_kw('tours.clientes.solicitudes', 'create', params, function (err, value_c) {
 
-                  if (err2) {
-                 
-                    return self.presentAlert('Falla!', 
-                      'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
-                  } 
-
-                  //traigo toda la informacion de los tours
-                  var inParams = [];       
-                  inParams.push([['id', '<>', '0']]);
-                  inParams.push(['id','name','codigo','description', 'company_id']); //fields
+                  //self.mensaje += 'Retorna valor'+ JSON.stringify(value_c);
+                  //self.mensaje += '4';
+                  var inParams = [];
+                  inParams.push([['id', '<>', '0']]);  
+                  inParams.push(['id', 'name', 'tour_id', 'state', 'num_person']); //fields 
                   var params = [];
-                  params.push(inParams);                                
-                  odoo.execute_kw('tours', 'search_read', params, function (err3, value2) {
-                    if (err3) {         
-                      return self.presentAlert('Falla!', 
-                        'Error: '+ JSON.stringify(err3, Object.getOwnPropertyNames(err3)) );
+                  params.push(inParams);
+                  odoo.execute_kw('tours.clientes.solicitudes', 'search_read', params, function (err_s, value_s) {
+                    //self.mensaje += '5';
+                    if (err_s) {
+                      self.cargar = false;
+                      return self.homeSinDatos();
                     }
-                    
-                    var events = []; 
 
-                    for(var key_s in value_s){                    
+                    //si no han habido cambios se pueden cargar desde memoria local
+                    self.storage.get('tours.guia').then((val) => {
+                 
+                      
+                      if(val == null){
+                        //Traigo todos los eventos proximos
+                        var inParams = [];
+                        inParams.push([['id', '<>', '0']]);  
+                        inParams.push(['id', 'guia_id', 'tour_id','date_begin','date_end']); //fields 
+                        var params = [];
+                        params.push(inParams);
+                        odoo.execute_kw('tours.guia', 'search_read', params, function (err2, value) {
 
-                      for (var key in value) {                  
-                        if(value_s[key_s].tour_id[0] == value[key].id ){
+                          if (err2) {
+                            self.cargar = false;
+                            return self.homeSinDatos();
+                          } 
 
-                          var dateStart = new Date((value[key]).date_begin);
-                          var dateEnd = new Date((value[key]).date_end);                    
-                          var startTime = new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate(), dateStart.getHours(), dateStart.getMinutes());
-                          var endTime = new Date(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate() , dateEnd.getHours(), dateEnd.getMinutes());
-                          for (var key2 in value2){
-                            if(value2[key2].id == (value[key]).tour_id[0]){
-                              events.push({
-                                title: (value2[key2]).name,
-                                startTime: startTime,
-                                endTime: endTime,
-                                allDay: false,
-                                description: (value2[key2]).description,
-                                guia: (value[key]).guia_id[1],
-                                ubicacion: (value2[key2]).company_id[1],
-                                estado: value_s[key_s].state,
-                                tour_id:value[key].id,
-                                home:false
-                              });            
-                              break;
+                          //traigo toda la informacion de los tours
+                          var inParams = [];       
+                          inParams.push([['id', '<>', '0']]);
+                          inParams.push(['id','name','codigo','description', 'company_id']); //fields
+                          var params = [];
+                          params.push(inParams);                                
+                          odoo.execute_kw('tours', 'search_read', params, function (err3, value2) {
+                            if (err3) {         
+                              self.cargar = false;
+                              return self.homeSinDatos();
                             }
-                          }                         
-                        }                      
-                      } 
-                    }
-                    self.storage.get('tours.eventos').then((val) => {
-     
-                      //si existen eventos del home los agrego al array principal
-                      if(val != null){
-                        
-                        for (var key in val) {            
-                          if((val[key]).home == true){
-                              events.push({
-                              title: (val[key]).title,
-                              startTime: new Date((val[key]).startTime),
-                              endTime: new Date((val[key]).endTime),
-                              allDay: false,
-                              description: (val[key]).description,
-                              guia: (val[key]).guia,
-                              ubicacion: (val[key]).ubicacion,
-                              estado: (val[key]).estado,
-                              home: (val[key]).home
-                            });  
-                          }                                   
-                        }                                                    
-                      }
-                      self.cargar = false; 
-                      self.calendar.eventSource = events;                                            
-                      self.storage.set('tours.eventos', events);
-                    });
+                            
+                            var eventsProx = []; 
+                            var ban= true;
+                                                
 
-                  });//odoo.execute_kw('tours'
+                              for (var key in value) {                  
+                                var dateStart = new Date((value[key]).date_begin);
+                                var dateEnd = new Date((value[key]).date_end);                    
+                                var startTime = new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate(), dateStart.getHours(), dateStart.getMinutes());
+                                var endTime = new Date(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate() , dateEnd.getHours(), dateEnd.getMinutes());                        
+                                  
+                                for (var key2 in value2){
+                                  if(value2[key2].id == (value[key]).tour_id[0]){
+                                    var evento = {
+                                      title: (value2[key2]).name,
+                                      startTime: startTime,
+                                      endTime: endTime,
+                                      allDay: false,
+                                      description: (value2[key2]).description,
+                                      guia: (value[key]).guia_id[1],
+                                      ubicacion: (value2[key2]).company_id[1],
+                                      estado: null,
+                                      tour_id:value[key].id,
+                                      home:false
+                                    }
 
-                });//odoo.execute_kw('tours.guia'
+                                    for(var key_s in value_s){
+                                      if(value_s[key_s].tour_id[0] == value[key].id ){
+                                        evento.estado = value_s[key_s].state;
+                                        events.push(evento);
+                                      }  
+                                    }                                                        
+                                    eventsProx.push(evento);
+                                    break;     
+                                  }
+                                }                         
+                              }
+                            
+                            self.storage.set('tours.guia', eventsProx); //si tiene eventos precargados
+                            self.cargar = false; 
+                            self.calendar.eventSource = events;                                            
+                            self.storage.set('tours.eventos', events);
 
-              }else{
+                          });//odoo.execute_kw('tours'
 
-                //self.mensaje += 'entro';
-                var events = []; 
-                //var events = []; 
+                        });//odoo.execute_kw('tours.guia'
 
+                      }else{
 
-                for(var key_s in value_s){   
+                        var eventsProx = []; 
 
-                    for (var key in val) {                  
+                        for (var key in val) {                  
 
-                      if(value_s[key_s].tour_id[0] == val[key].tour_id ){
-
-                          //self.mensaje += 'entro_ una';
-                          events.push({
+                          var evento = {
                             title: (val[key]).title,
                             startTime: new Date((val[key]).startTime),
                             endTime: new Date((val[key]).endTime),
@@ -176,51 +196,71 @@ export class HomePage {
                             guia: (val[key]).guia,
                             ubicacion: (val[key]).ubicacion,
                             tour_id: (val[key]).tour_id,
-                            estado: value_s[key_s].state,
+                            estado: null,
                             home: false
-                          });
-                      }                         
-                    }                                        
-                }
+                          }
+                          for(var key_s in value_s){
+                            if(value_s[key_s].tour_id[0] == val[key].tour_id ){
+                              evento.estado = value_s[key_s].state;
+                              events.push(evento);
+                              break;
+                            }
+                          }  
+                          eventsProx.push(evento);
 
-                 //traigo todos los eventos guardados 
-                self.storage.get('tours.eventos').then((val2) => {
- 
-                  //si existen eventos del home los agrego al array principal
-                  if(val2 != null){
-                    
-                    for (var key2 in val2) {            
-                      if((val2[key2]).home == true){
-                          events.push({
-                          title: (val2[key2]).title,
-                          startTime: new Date((val2[key2]).startTime),
-                          endTime: new Date((val2[key2]).endTime),
-                          allDay: false,
-                          description: (val2[key2]).description,
-                          guia: (val2[key2]).guia,
-                          ubicacion: (val2[key2]).ubicacion,
-                          estado: (val2[key2]).estado,
-                          home: (val2[key2]).home
-                        });  
-                      }                                   
-                    }                                                    
-                  }
-                  self.cargar = false; 
-                  self.calendar.eventSource = events;                                            
-                  self.storage.set('tours.eventos', events);
-                });
+                        }   
+                                                                 
+                        
+                        //self.mensaje += 'entro por aca';
+                        self.storage.set('tours.guia', eventsProx); //si tiene eventos precargados
+                        self.cargar = false; 
+                        self.calendar.eventSource = events;                                            
+                        self.storage.set('tours.eventos', events);
 
+                      }//else
 
-              }//else
-
-            });//self.storage.get('tours.guia')
-          
-          });// odoo.execute_kw('tours.clientes.solicitudes'      
-
-        });//odoo.connect(function (err) {
-      }
-    });
+                    });//self.storage.get('tours.guia')
+                  
+                  });// odoo.execute_kw('tours.clientes.solicitudes'  
+                });                
+              });
+            });
+          });//odoo.connect(function (err) {
+        }
+      });
+    }    
   }  
+
+  homeSinDatos(){
+
+
+    var self = this;
+    self.storage.get('tours.eventos').then((val) => {
+
+      var events = []; 
+
+      for (var key in val) {                  
+
+            //self.mensaje += 'entro_ una';
+            events.push({
+              title: (val[key]).title,
+              startTime: new Date((val[key]).startTime),
+              endTime: new Date((val[key]).endTime),
+              allDay: false,
+              description: (val[key]).description,
+              guia: (val[key]).guia,
+              ubicacion: (val[key]).ubicacion,
+              tour_id: (val[key]).tour_id,
+              estado: val[key].estado,
+              home: val[key].home
+            });
+      }   
+
+      self.cargar = false; 
+      self.calendar.eventSource = events;                                            
+      self.storage.set('tours.eventos', events);
+    });
+  }
 
   onCurrentDateChanged(event:Date){
     this.fecha = event;
@@ -228,7 +268,7 @@ export class HomePage {
 
   addEvent(){
 
-  	let modal = this.modalCtrl.create(EvenDetailPage, {startTime: new Date(this.fecha), endTime:new Date(this.fecha), home:true, nuevo:true});
+  	let modal = this.modalCtrl.create(EvenDetailPage, {startTime: new Date(this.fecha), endTime:new Date(this.fecha), home:true, nuevo:true, editable:true});
     modal.present();
     modal.onDidDismiss(data => {
       if (data) {
@@ -269,7 +309,8 @@ export class HomePage {
       guia:evt.guia,
       ubicacion:evt.ubicacion,
       home:true,
-      estado:evt.estado
+      estado:evt.estado,
+      editable:false
     });
   }
 

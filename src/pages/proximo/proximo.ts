@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController} from 'ionic-angular';
+import { NavController, NavParams, AlertController, ModalController} from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import  * as Odoo from 'odoo-xmlrpc';
 import { EvenDetailPage } from '../even-detail/even-detail';
 import { ListPage } from '../../pages/list/list';
 
-
-@IonicPage()
 @Component({
   selector: 'page-proximo',
   templateUrl: 'proximo.html',
@@ -30,7 +28,7 @@ export class ProximoPage {
   cargar = true;
   viewTitle = '';
   //mensaje = '';
-  constructor(public navCtrl: NavController, public navParams: NavParams, private alertCtrl: AlertController, private storage: Storage) {
+  constructor(public navCtrl: NavController, public modalCtrl: ModalController, public navParams: NavParams, private alertCtrl: AlertController, private storage: Storage) {
 
     var self = this;
     self.calendar.eventSource = [];
@@ -114,9 +112,11 @@ export class ProximoPage {
                 endTime: new Date((val[key]).endTime),
                 allDay: false,
                 description: (val[key]).description,
+                estado: val[key].estado,
                 guia: (val[key]).guia,
                 ubicacion: (val[key]).ubicacion,
-                tour_id: (val[key]).tour_id
+                tour_id: (val[key]).tour_id,
+                home:false
               });         
             }       
             self.cargar = false;       
@@ -154,15 +154,55 @@ export class ProximoPage {
 
 	onEventSelected(evt){
 
-    this.navCtrl.push(EvenDetailPage, {
-      title: evt.title, 
+    let evento = {title: evt.title, 
       startTime: evt.startTime,
       endTime: evt.endTime, 
       description: evt.description,
       guia:evt.guia,
       ubicacion:evt.ubicacion,
       tour_id:evt.tour_id,
-      home:false
-    });
+      estado:evt.estado,
+      home:false,
+      editable:false};
+
+    if(evt.estado != null){
+      this.navCtrl.push(EvenDetailPage, evento);
+    }else{
+      evt.home = true;
+      let modal = this.modalCtrl.create(EvenDetailPage, evento);
+      modal.present();
+      var self = this;
+      modal.onDidDismiss(data => {
+        if (data) {
+
+          self.storage.get('tours.eventos').then((val) => {
+            //actualizo el home
+            val.push(data);
+            self.storage.set('tours.eventos', val);          
+          });
+
+          self.storage.get('tours.guia').then((val) => {
+            
+            let events = self.calendar.eventSource;  
+            self.calendar.eventSource = [];
+            for (var key in events) {            
+               if(events[key].tour_id == evt.tour_id && evt.startTime == events[key].startTime){
+                  
+                  let eventData = data; //->busco el evento original y lo reemplazo 
+                  eventData.startTime = new Date(data.startTime);
+                  eventData.endTime = new Date(data.endTime);                  
+                  events[key] = eventData;
+                  break;
+               }
+            }       
+            setTimeout(() => {
+              this.calendar.eventSource = events;
+              this.storage.set('tours.guia', events);
+            });
+
+          });
+        }
+      });
+    }    
 	}
 }
