@@ -25,6 +25,7 @@ import { Camera } from '@ionic-native/camera';
 import { Network } from '@ionic-native/network';
 import { PhotoViewer } from '@ionic-native/photo-viewer';
 import { Base64ToGallery } from '@ionic-native/base64-to-gallery';
+import { AndroidPermissions } from '@ionic-native/android-permissions';
 
 @NgModule({
   declarations: [
@@ -66,7 +67,8 @@ import { Base64ToGallery } from '@ionic-native/base64-to-gallery';
     CrearCuentaPage
   ],
   providers: [
-    Base64ToGallery,    
+    Base64ToGallery, 
+    AndroidPermissions,   
     Camera,
     Network,
     PhotoViewer,

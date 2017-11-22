@@ -25,11 +25,12 @@
   </div>
 
   
+  <div>{{mensaje}}</div>
  <ion-slides pager=true zoom="true">
     <ion-slide *ngFor="let item of items;" (ionSlideDidChange)="slideChanged()">      
       <ion-card>
 
-        <img [src]="item.punto_encuentro2" (click)="zoomImage(item.mapa)" alt="Sin mapa">
+        <img [src]="item.punto_encuentro2" (click)="zoomImage(item)" alt="Sin mapa">
 
         <ion-item>
           <ion-icon name="pin" item-start large></ion-icon>

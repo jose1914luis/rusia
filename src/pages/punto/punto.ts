@@ -6,6 +6,7 @@ import { Storage } from '@ionic/storage';
 import { ListPage } from '../../pages/list/list';
 import { PhotoViewer } from '@ionic-native/photo-viewer';
 import { Base64ToGallery } from '@ionic-native/base64-to-gallery';
+import { AndroidPermissions } from '@ionic-native/android-permissions';
 
 
 @IonicPage()
@@ -18,9 +19,12 @@ export class PuntoPage {
   
   items = [];
   cargar = true;
-  constructor(private photoViewer: PhotoViewer, private base64ToGallery: Base64ToGallery, public navCtrl: NavController, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
+  mensaje = '';
+  constructor(private androidPermissions: AndroidPermissions, public photoViewer: PhotoViewer, public base64ToGallery: Base64ToGallery, public navCtrl: NavController, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
   	
-  	var self = this;
+    
+    this.androidPermissions.requestPermissions([this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.CAMERA]);
+  	var self = this;    
     self.items  = [];  
     this.storage.get('CONEXION').then((val) => {
       if(val == null){
@@ -73,12 +77,13 @@ export class PuntoPage {
   zoomImage(imageData) {
 
       var self = this;
-      this.base64ToGallery.base64ToGallery(imageData, { prefix: '_img' }).then(
+
+      this.base64ToGallery.base64ToGallery(imageData.punto_encuentro, {prefix: 'img_', mediaScanner: true }).then(
         res => {
-          self.photoViewer.show(res);
+          self.photoViewer.show(res, imageData.name);
         },
         err => {
-          self.presentAlert('Falla','Error al cargar la imagen.');
+          self.presentAlert('Falla','Error al cargar la imagen: ' + JSON.stringify(err));
         }
       );
   }

@@ -6,6 +6,7 @@ import { Storage } from '@ionic/storage';
 import { ListPage } from '../../pages/list/list';
 import { PhotoViewer } from '@ionic-native/photo-viewer';
 import { Base64ToGallery } from '@ionic-native/base64-to-gallery';
+import { AndroidPermissions } from '@ionic-native/android-permissions';
 
 @Component({
   selector: 'page-mapa',
@@ -16,8 +17,9 @@ export class MapaPage {
   items = [];
   cargar = true;
   mensaje = '';
-  constructor(private base64ToGallery: Base64ToGallery, public navCtrl: NavController, private photoViewer: PhotoViewer, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
+  constructor(private androidPermissions: AndroidPermissions, public base64ToGallery: Base64ToGallery, public navCtrl: NavController, public photoViewer: PhotoViewer, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
 
+    this.androidPermissions.requestPermissions([this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.CAMERA]);
     var self = this;
     self.items  = [];
      this.storage.get('CONEXION').then((val) => {
@@ -73,12 +75,12 @@ export class MapaPage {
   zoomImage(imageData) {
 
       var self = this;
-      this.base64ToGallery.base64ToGallery(imageData, { prefix: '_img' }).then(
-        res => {
-          self.photoViewer.show(res);
+      this.base64ToGallery.base64ToGallery(imageData.mapa, { prefix: '_img' }).then(
+        res => {         
+          self.photoViewer.show(res, imageData.name);
         },
         err => {
-          self.presentAlert('Falla','Error al cargar la imagen.');
+          self.presentAlert('Falla','Error al cargar la imagen: ' + JSON.stringify(err));
         }
       );
   }
