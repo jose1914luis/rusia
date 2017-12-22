@@ -64,6 +64,7 @@ export class ListPage {
     var self = this;
     
     if(this.network.type.toLowerCase() == 'unknown' || this.network.type.toLowerCase() == 'none'){// no hay conexion
+    //if(this.network.type.toLowerCase() == 'unknown' || this.network.type.toLowerCase() == 'none'){// no hay conexion
       self.cargar = true;
       this.loginSinDatos();
     }else{
