@@ -4,7 +4,7 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {PromoDetailPage} from '../../pages/promo-detail/promo-detail';
 import {Storage} from '@ionic/storage';
 import {ListPage} from '../../pages/list/list';
-
+import {PROXY} from '../../providers/constants/constants';
 
 declare var OdooApi: any;
 @IonicPage()
@@ -16,9 +16,6 @@ export class PromocionPage {
 
     items = [];
     cargar = true;
-    //promocion = {city:'', numero:0, items:[]};
-    proxy = '/api';
-    //proxy = 'http://moscutourgratis.com:806
     constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
         var self = this;
         self.items = [];
@@ -27,7 +24,7 @@ export class PromocionPage {
                 self.navCtrl.setRoot(ListPage, {borrar: true, login: null});
             } else {
                 var con = val;
-                var odoo = new OdooApi(this.proxy, con.db);
+                var odoo = new OdooApi(PROXY, con.db);
                 this.storage.get('tours.promociones').then((val) => {
                     if (val == null) {
 

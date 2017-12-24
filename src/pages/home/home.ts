@@ -4,6 +4,7 @@ import {Network} from '@ionic-native/network';
 import {Storage} from '@ionic/storage';
 import {ListPage} from '../../pages/list/list';
 import {EvenDetailPage} from '../even-detail/even-detail';
+import {PROXY} from '../../providers/constants/constants';
 
 declare var OdooApi: any;
 @Component({
@@ -29,8 +30,6 @@ export class HomePage {
     cargar = true;
     viewTitle = '';
     fecha = new Date();
-    proxy = '/api';
-    //proxy = 'http://moscutourgratis.com:8069';
     constructor(private network: Network, public navCtrl: NavController, public modalCtrl: ModalController, private alertCtrl: AlertController, private storage: Storage) {
         //this.homeSinDatos();
         var self = this;
@@ -46,7 +45,7 @@ export class HomePage {
                 } else {// se encontraron datos para la conexion 
                     self.cargar = true;
                     var con = val;
-                    var odoo = new OdooApi(this.proxy, con.db);
+                    var odoo = new OdooApi(PROXY, con.db);
                     odoo.login(con.username, con.password).then(
                         function (uid) {
                             //Si estoy conectado debo primero actualizar las solicitudes

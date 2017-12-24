@@ -6,6 +6,7 @@ import {ListPage} from '../../pages/list/list';
 import {PhotoViewer} from '@ionic-native/photo-viewer';
 import {Base64ToGallery} from '@ionic-native/base64-to-gallery';
 import {AndroidPermissions} from '@ionic-native/android-permissions';
+import {PROXY} from '../../providers/constants/constants';
 
 declare var OdooApi: any;
 @IonicPage()
@@ -19,8 +20,6 @@ export class PuntoPage {
     items = [];
     cargar = true;
     mensaje = '';
-    proxy = '/api';
-    //proxy = 'http://moscutourgratis.com:8069';
     
     constructor(private androidPermissions: AndroidPermissions, public photoViewer: PhotoViewer, public base64ToGallery: Base64ToGallery, public navCtrl: NavController, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
 
@@ -32,7 +31,7 @@ export class PuntoPage {
                 self.navCtrl.setRoot(ListPage, {borrar: true, login: null});
             } else {
                 var con = val;
-                var odoo = new OdooApi(this.proxy, con.db);
+                var odoo = new OdooApi(PROXY, con.db);
                 this.storage.get('tours.companies').then((val) => {
                     if (val == null) {
 

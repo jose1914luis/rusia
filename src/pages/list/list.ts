@@ -4,6 +4,7 @@ import {Network} from '@ionic-native/network';
 import {Storage} from '@ionic/storage';
 import {HomePage} from '../../pages/home/home';
 import {CrearCuentaPage} from '../../pages/crear-cuenta/crear-cuenta';
+import {PROXY} from '../../providers/constants/constants';
 
 declare var OdooApi: any;
 @Component({
@@ -23,8 +24,7 @@ export class ListPage {
     };
     cargar = true;
     mensaje = '';
-    proxy = '/api';
-    //proxy = 'http://moscutourgratis.com:8069';
+    
     constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, public alertCtrl: AlertController, private network: Network) {
 
         var borrar = this.navParams.get('borrar');
@@ -89,7 +89,7 @@ export class ListPage {
                 }
                 self.cargar = true;
                 //var odoo = new Odoo(con);
-                var odoo = new OdooApi(this.proxy, con.db);
+                var odoo = new OdooApi(PROXY, con.db);
                 odoo.login(con.username, con.password).then(
                     function (uid) {
                         

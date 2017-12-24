@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {NavController, NavParams, ViewController, AlertController} from 'ionic-angular';
 import {Storage} from '@ionic/storage';
 import {ListPage} from '../../pages/list/list';
+import {PROXY} from '../../providers/constants/constants';
 
 
 declare var OdooApi: any;
@@ -16,8 +17,7 @@ export class EvenDetailPage {
     event_color = '';
     nuevo = false;
     editable = true;
-    proxy = '/api';
-    //proxy = 'http://moscutourgratis.com:806
+    
     event = {estado_bol: false, estado: null, title: '', startTime: null, num_person: 0, endTime: null, allDay: false, description: null, guia: null, ubicacion: null, home: false, tour_id: null}
     constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, private alertCtrl: AlertController, private storage: Storage) {
         this.event.title = this.navParams.get('title');
@@ -130,7 +130,7 @@ export class EvenDetailPage {
                                 self.navCtrl.setRoot(ListPage, {borrar: true, login: null});
                             } else {
                                 var con = val;
-                                var odoo = new OdooApi(self.proxy, con.db);
+                                var odoo = new OdooApi(PROXY, con.db);
 
                                 odoo.login(con.username, con.password).then(
                                     function (uid) {

@@ -3,6 +3,7 @@ import {NavController, NavParams, AlertController, ModalController} from 'ionic-
 import {Storage} from '@ionic/storage';
 import {EvenDetailPage} from '../even-detail/even-detail';
 import {ListPage} from '../../pages/list/list';
+import {PROXY} from '../../providers/constants/constants';
 
 declare var OdooApi: any;
 @Component({
@@ -28,8 +29,6 @@ export class ProximoPage {
     cargar = true;
     viewTitle = '';
     //mensaje = '';
-    proxy = '/api';
-    //proxy = 'http://moscutourgratis.com:8069';
     constructor(public navCtrl: NavController, public modalCtrl: ModalController, public navParams: NavParams, private alertCtrl: AlertController, private storage: Storage) {
 
         var self = this;
@@ -40,7 +39,7 @@ export class ProximoPage {
             } else {
             
                 var con = val;
-                var odoo = new OdooApi(this.proxy, con.db);
+                var odoo = new OdooApi(PROXY, con.db);
                 this.storage.get('tours.guia').then((val) => {
 
                     if (val == null) {

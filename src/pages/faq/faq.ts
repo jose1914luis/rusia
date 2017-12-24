@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {IonicPage, NavController, NavParams, AlertController} from 'ionic-angular';
 import {ListPage} from '../../pages/list/list';
 import {Storage} from '@ionic/storage';
+import {PROXY} from '../../providers/constants/constants';
 
 declare var OdooApi: any;
 @IonicPage()
@@ -13,8 +14,7 @@ export class FaqPage {
 
     items = [];
     cargar = true;
-    proxy = '/api';
-    //proxy = 'http://moscutourgratis.com:806
+    
     constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private storage: Storage) {
 
         var self = this;
@@ -24,7 +24,7 @@ export class FaqPage {
                 self.navCtrl.setRoot(ListPage, {borrar: true, login: null});
             } else {
                 var con = val;
-                var odoo = new OdooApi(this.proxy, con.db);
+                var odoo = new OdooApi(PROXY, con.db);
                 this.storage.get('tours.clientes.faq').then((val) => {
 
                     if (val == null) {
