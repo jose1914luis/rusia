@@ -1,93 +1,92 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
-import  * as Odoo from 'odoo-xmlrpc';
-import { ListPage } from '../../pages/list/list';
-import { Storage } from '@ionic/storage';
+import {Component} from '@angular/core';
+import {IonicPage, NavController, NavParams, AlertController} from 'ionic-angular';
+import {ListPage} from '../../pages/list/list';
+import {Storage} from '@ionic/storage';
 
-
+declare var OdooApi: any;
 @IonicPage()
 @Component({
-  selector: 'page-faq',
-  templateUrl: 'faq.html',
+    selector: 'page-faq',
+    templateUrl: 'faq.html',
 })
 export class FaqPage {
 
-  items = [];
-  cargar = true;
+    items = [];
+    cargar = true;
+    proxy = '/api';
+    //proxy = 'http://moscutourgratis.com:806
+    constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private storage: Storage) {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private storage: Storage) {
-    
-    var self = this;
-    self.items  = [];
-    this.storage.get('CONEXION').then((val) => {
-      if(val == null){
-        self.navCtrl.setRoot(ListPage,{borrar: true, login:null});
-      }else{
-        var odoo = new Odoo(val);
-        this.storage.get('tours.clientes.faq').then((val) => {
+        var self = this;
+        self.items = [];
+        this.storage.get('CONEXION').then((val) => {
+            if (val == null) {
+                self.navCtrl.setRoot(ListPage, {borrar: true, login: null});
+            } else {
+                var con = val;
+                var odoo = new OdooApi(this.proxy, con.db);
+                this.storage.get('tours.clientes.faq').then((val) => {
 
-          if(val == null){
-          	odoo.connect(function (err) {
-        	    if (err) { 
+                    if (val == null) {
 
-        	    	return self.presentAlert('Falla!', 
-        	    		'Error: '+ JSON.stringify(err, Object.getOwnPropertyNames(err)) );
-        	    }	    
-        	    var inParams = [];
-            	inParams.push([['id', '<>', '0']]);    	
-              inParams.push(['id', 'response', 'name']); //fields
-            	var params = [];
-            	params.push(inParams);
+                        odoo.login(con.username, con.password).then(
+                            function (uid) {
+                                odoo.search_read('tours.clientes.faq', [['id', '<>', '0']], ['id', 'response', 'name']).then(
+                                    function (value) {
 
-                odoo.execute_kw('tours.clientes.faq', 'search_read', params, function (err2, value) {
+                                        for (var key in value) {
+                                            (value[key]).icon = 'arrow-dropdown-circle';
+                                            (value[key]).visible = false;
+                                            self.items.push((value[key]));
+                                        }
+                                        self.cargar = false;
+                                        self.storage.set('tours.clientes.faq', value);
+                                    },
+                                    function () {
+                                        self.cargar = false;
+                                        self.presentAlert('Falla!', 'Imposible conectarse');
+                                    }
+                                );
+                            },
+                            function () {
+                                self.cargar = false;
+                                self.presentAlert('Falla!', 'Imposible conectarse');
+                            }
+                        );
 
-                  if (err2) {
+                    } else {
 
-                  	return self.presentAlert('Falla!', 
-                  		'Error: '+ JSON.stringify(err2, Object.getOwnPropertyNames(err2)) );
-                  }                        
-                  for (var key in value) {
-                    (value[key]).icon = 'arrow-dropdown-circle';
-                    (value[key]).visible = false;
-                    self.items.push((value[key]));                      
-                  }
-                  self.cargar = false;                  
-                  self.storage.set('tours.clientes.faq', value);
+                        for (var key in val) {
+                            self.items.push((val[key]));
+                        }
+                        self.cargar = false;
+                    }
                 });
-        	  });
-          }else{
-
-            for (var key in val) {
-              self.items.push((val[key]));
             }
-            self.cargar = false;
-          }      
-        });   
-      }
-    });
-  }
+        });
+    }
 
-  presentAlert(titulo, texto) {
-    const alert = this.alertCtrl.create({
-      title: titulo,
-      subTitle: texto,
-      buttons: ['Ok']
-    });
-    alert.present();
-  }
+    presentAlert(titulo, texto) {
+        const alert = this.alertCtrl.create({
+            title: titulo,
+            subTitle: texto,
+            buttons: ['Ok']
+        });
+        alert.present();
+    }
 
-  ionViewDidLoad() {
-    //console.log('ionViewDidLoad FaqPage');
-  }
+    ionViewDidLoad() {
+        //console.log('ionViewDidLoad FaqPage');
+    }
 
-  showResponse(item){
-  	if(item.visible){
-  		item.visible = false;
-  		item.icon = 'arrow-dropup-circle';
-  	}else{
-  		item.visible = true;
-  		item.icon = 'arrow-dropdown-circle';
-  	}  	
-  }
+    showResponse(item) {
+        if (item.visible) {
+            item.visible = false;
+            item.icon = 'arrow-dropup-circle';
+        } else {
+            item.visible = true;
+            item.icon = 'arrow-dropdown-circle';
+        }
+    }
 
 }

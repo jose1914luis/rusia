@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { NavController, NavParams, AlertController } from 'ionic-angular';
 
 //import {  } from '@ionic-native';
 
@@ -10,7 +10,6 @@ import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angu
  * Ionic pages and navigation.
  */
 /*declare var cordova: any;*/
-@IonicPage()
 @Component({
   selector: 'page-contacto',
   templateUrl: 'contacto.html',
