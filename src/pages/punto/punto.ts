@@ -5,7 +5,7 @@ import {Storage} from '@ionic/storage';
 import {ListPage} from '../../pages/list/list';
 import {PhotoViewer} from '@ionic-native/photo-viewer';
 import {Base64ToGallery} from '@ionic-native/base64-to-gallery';
-import {AndroidPermissions} from '@ionic-native/android-permissions';
+//import {AndroidPermissions} from '@ionic-native/android-permissions';
 import {PROXY} from '../../providers/constants/constants';
 
 declare var OdooApi: any;
@@ -21,9 +21,10 @@ export class PuntoPage {
     cargar = true;
     mensaje = '';
     
-    constructor(private androidPermissions: AndroidPermissions, public photoViewer: PhotoViewer, public base64ToGallery: Base64ToGallery, public navCtrl: NavController, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
+    //private androidPermissions: AndroidPermissions,
+    constructor( public photoViewer: PhotoViewer, public base64ToGallery: Base64ToGallery, public navCtrl: NavController, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
 
-        this.androidPermissions.requestPermissions([this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.CAMERA]);
+        //this.androidPermissions.requestPermissions([this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.CAMERA]);
         var self = this;
         self.items = [];
         this.storage.get('CONEXION').then((val) => {
