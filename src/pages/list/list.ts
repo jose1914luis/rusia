@@ -24,7 +24,7 @@ export class ListPage {
     };
     cargar = true;
     mensaje = '';
-    
+
     constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, public alertCtrl: AlertController, private network: Network) {
 
         var borrar = this.navParams.get('borrar');
@@ -92,11 +92,11 @@ export class ListPage {
                 var odoo = new OdooApi(PROXY, con.db);
                 odoo.login(con.username, con.password).then(
                     function (uid) {
-                        
+
 
                         odoo.search_read('res.users', [['login', '=', 'jose1914luis@gmail.com']], ['id', 'login', 'user_email', 'image', 'name']).then(
                             function (value) {
-                                
+
                                 var user = {id: null, name: null, image: null, login: null, cliente_id: null};
                                 //self.mensaje += JSON.stringify(value);
                                 if (value.length > 0) {
@@ -120,8 +120,77 @@ export class ListPage {
                                         }
 
                                         self.storage.set('res.users', user);//guardo en tabla local
-                                        self.navCtrl.setRoot(HomePage); //-> me voy para la home page
+                                                       
+                                        //Guardo el ultimo registro de todas las tablas modificadas
+                                        
+                                        var tablas = [];
+                                        odoo.search_read('app.logs', [['name', '=', 'tours.guia']], ['id_modify', 'name', 'action'], 0, 1, 'id_modify desc').then(
+                                            function (value3) {
+                                                if (value3.length > 0) {
+                                                    tablas.push({name: value3[0].name, ultimo_id: value3[0].id});
+                                                    odoo.search_read('app.logs', [['name', '=', 'tours.clientes.faq']], ['id_modify', 'name', 'action'], 0, 1, 'id_modify desc').then(
+                                                        function (value3) {
+                                                            if (value3.length > 0) {
+                                                                tablas.push({name: value3[0].name, ultimo_id: value3[0].id});
+                                                            }
+                                                            odoo.search_read('app.logs', [['name', '=', 'tours.companies']], ['id_modify', 'name', 'action'], 0, 1, 'id_modify desc').then(
+                                                                function (value3) {
+                                                                    if (value3.length > 0) {
+                                                                        tablas.push({name: value3[0].name, ultimo_id: value3[0].id});
+                                                                    }
+                                                                    odoo.search_read('app.logs', [['name', '=', 'tours.promociones']], ['id_modify', 'name', 'action'], 0, 1, 'id_modify desc').then(
+                                                                        function (value3) {
+                                                                            if (value3.length > 0) {
+                                                                                tablas.push({name: value3[0].name, ultimo_id: value3[0].id});
+                                                                            }
 
+                                                                            //busco lo ultimo guardado de tablas
+                                                                            self.storage.get('tablas').then((val) => {
+
+                                                                                if (val != null) {
+
+                                                                                    for (var key in val) {
+
+                                                                                        for (var key2 in tablas) {  //Resetiar tablas
+                                                                                            if (val[key].name == 'tours.guia' && tablas[key2].name == 'tours.guia' && val[key2].ultimo_id < tablas[key2].ultimo_id) {
+                                                                                                self.storage.set('tours.guia', null);
+                                                                                            }
+                                                                                            if (val[key].name == 'tours.promociones' && tablas[key2].name == 'tours.promociones' && val[key2].ultimo_id < tablas[key2].ultimo_id) {
+                                                                                                self.storage.set('tours.promociones', null);
+                                                                                            }
+                                                                                            if (val[key].name == 'tours.companies' && tablas[key2].name == 'tours.companies' && val[key2].ultimo_id < tablas[key2].ultimo_id) {
+                                                                                                self.storage.set('tours.companies', null);
+                                                                                            }
+                                                                                            if (val[key].name == 'tours.clientes.faq' && tablas[key2].name == 'tours.clientes.faq' && val[key2].ultimo_id < tablas[key2].ultimo_id) {
+                                                                                                self.storage.set('tours.clientes.faq', null);
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                                self.storage.set('tablas', tablas);//guardo en tabla local
+                                                                                self.navCtrl.setRoot(HomePage); //-> me voy para la home page
+                                                                            });
+                                                                        },
+                                                                        function () {
+                                                                            return self.loginSinDatos();
+                                                                        }
+                                                                    );
+                                                                },
+                                                                function () {
+                                                                    return self.loginSinDatos();
+                                                                }
+                                                            );
+                                                        },
+                                                        function () {
+                                                            return self.loginSinDatos();
+                                                        }
+                                                    );
+                                                }
+                                            },
+                                            function () {
+                                                return self.loginSinDatos();
+                                            }
+                                        );                                       
                                     },
                                     function () {
                                         //console.log('error mostrando ids');
@@ -142,7 +211,7 @@ export class ListPage {
                         //self.mensaje += 'error tranando de conectarme';
                         return self.loginSinDatos();
                     }
-                );                
+                );
             });
         }
 
