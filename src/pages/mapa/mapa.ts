@@ -4,7 +4,7 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {Storage} from '@ionic/storage';
 import {ListPage} from '../../pages/list/list';
 import {PhotoViewer} from '@ionic-native/photo-viewer';
-import {Base64ToGallery} from '@ionic-native/base64-to-gallery';
+import { File } from '@ionic-native/file';
 //import {AndroidPermissions} from '@ionic-native/android-permissions';
 import {PROXY} from '../../providers/constants/constants';
 
@@ -17,10 +17,10 @@ export class MapaPage {
 
     items = [];
     cargar = true;
-    mensaje = '';
+    mensaje = 'Cargando Imagenes...';
     
     //private androidPermissions: AndroidPermissions,
-    constructor( public base64ToGallery: Base64ToGallery, public navCtrl: NavController, public photoViewer: PhotoViewer, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
+    constructor( private file: File, public navCtrl: NavController, public photoViewer: PhotoViewer, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
 
         //this.androidPermissions.requestPermissions([this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.CAMERA]);
         var self = this;
@@ -74,17 +74,54 @@ export class MapaPage {
         });
     }
 
+    b64toBlob(b64Data, contentType, sliceSize) {
+        contentType = contentType || '';
+        sliceSize = sliceSize || 512;
+
+        var byteCharacters = atob(b64Data);
+        var byteArrays = [];
+
+        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+            var byteNumbers = new Array(slice.length);
+            for (var i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            var byteArray = new Uint8Array(byteNumbers);
+
+            byteArrays.push(byteArray);
+        }
+
+        var blob = new Blob(byteArrays, {type: contentType});
+        return blob;
+    }
+
     zoomImage(imageData) {
 
         var self = this;
-        this.base64ToGallery.base64ToGallery(imageData.mapa, {prefix: '_img'}).then(
-            res => {
-                self.photoViewer.show(res, imageData.name);
-            },
-            err => {
-                self.presentAlert('Falla', 'Error al cargar la imagen: ' + JSON.stringify(err));
-            }
-        );
+        self.cargar = true;
+        self.mensaje = 'Preparando Imagen...';
+
+        this.file.createFile(this.file.dataDirectory, imageData.id + 'mapa.jpg', true)
+            .then(FileEntry => {
+
+                self.file.writeExistingFile(self.file.dataDirectory, imageData.id + 'mapa.jpg', self.b64toBlob(imageData.mapa, 'image/jpeg', 512)).then(
+                    Result => {
+
+                        self.cargar = false;
+                        self.photoViewer.show(self.file.dataDirectory + imageData.id + 'mapa.jpg', imageData.name);
+                    }
+                ).catch(err => {
+                    self.presentAlert('Falla!', 'Imposible cargar: ' + JSON.stringify(err));
+                });
+
+            })
+            .catch(err => {
+
+                self.presentAlert('Falla!', 'Imposible cargar: ' + JSON.stringify(err));
+            });
     }
 
     presentAlert(titulo, texto) {

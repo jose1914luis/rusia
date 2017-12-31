@@ -1,15 +1,13 @@
 import {Component} from '@angular/core';
-import {IonicPage, NavController, AlertController} from 'ionic-angular';
+import {NavController, AlertController} from 'ionic-angular';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Storage} from '@ionic/storage';
 import {ListPage} from '../../pages/list/list';
 import {PhotoViewer} from '@ionic-native/photo-viewer';
-import {Base64ToGallery} from '@ionic-native/base64-to-gallery';
-//import {AndroidPermissions} from '@ionic-native/android-permissions';
+import { File } from '@ionic-native/file';
 import {PROXY} from '../../providers/constants/constants';
 
 declare var OdooApi: any;
-@IonicPage()
 @Component({
     selector: 'page-punto',
     templateUrl: 'punto.html',
@@ -19,10 +17,10 @@ export class PuntoPage {
 
     items = [];
     cargar = true;
-    mensaje = '';
+    mensaje = 'Cargando Imagenes...';
     
     //private androidPermissions: AndroidPermissions,
-    constructor( public photoViewer: PhotoViewer, public base64ToGallery: Base64ToGallery, public navCtrl: NavController, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
+    constructor( private file: File, public photoViewer: PhotoViewer, public navCtrl: NavController, public alertCtrl: AlertController, private _DomSanitizer: DomSanitizer, private storage: Storage) {
 
         //this.androidPermissions.requestPermissions([this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE, this.androidPermissions.PERMISSION.CAMERA]);
         var self = this;
@@ -72,18 +70,55 @@ export class PuntoPage {
         });
     }
 
+    b64toBlob(b64Data, contentType, sliceSize) {
+        contentType = contentType || '';
+        sliceSize = sliceSize || 512;
+
+        var byteCharacters = atob(b64Data);
+        var byteArrays = [];
+
+        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+            var byteNumbers = new Array(slice.length);
+            for (var i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            var byteArray = new Uint8Array(byteNumbers);
+
+            byteArrays.push(byteArray);
+        }
+
+        var blob = new Blob(byteArrays, {type: contentType});
+        return blob;
+    }
+
     zoomImage(imageData) {
 
         var self = this;
+        self.cargar = true;
+        self.mensaje = 'Preparando Imagen...';
 
-        this.base64ToGallery.base64ToGallery(imageData.punto_encuentro, {prefix: 'img_', mediaScanner: true}).then(
-            res => {
-                self.photoViewer.show(res, imageData.name);
-            },
-            err => {
-                self.presentAlert('Falla', 'Error al cargar la imagen: ' + JSON.stringify(err));
-            }
-        );
+        this.file.createFile(this.file.dataDirectory, imageData.id + 'punto.jpg', true)
+            .then(FileEntry => {
+
+                self.file.writeExistingFile(self.file.dataDirectory, imageData.id + 'punto.jpg', self.b64toBlob(imageData.punto_encuentro, 'image/jpeg', 512)).then(
+                    Result => {
+
+                        self.cargar = false;
+                        self.photoViewer.show(self.file.dataDirectory + imageData.id + 'punto.jpg', imageData.name);
+                    }
+                ).catch(err => {
+                    self.presentAlert('Falla!', 'Imposible cargar: ' + JSON.stringify(err));
+                });
+
+            })
+            .catch(err => {
+
+                self.presentAlert('Falla!', 'Imposible cargar: ' + JSON.stringify(err));
+            });
+        
     }
 
     ionViewDidLoad() {

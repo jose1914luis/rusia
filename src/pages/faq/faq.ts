@@ -1,11 +1,11 @@
 import {Component} from '@angular/core';
-import {IonicPage, NavController, NavParams, AlertController} from 'ionic-angular';
+import {NavController, NavParams, AlertController} from 'ionic-angular';
 import {ListPage} from '../../pages/list/list';
 import {Storage} from '@ionic/storage';
 import {PROXY} from '../../providers/constants/constants';
 
 declare var OdooApi: any;
-@IonicPage()
+
 @Component({
     selector: 'page-faq',
     templateUrl: 'faq.html',

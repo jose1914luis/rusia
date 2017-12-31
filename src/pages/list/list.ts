@@ -19,8 +19,8 @@ export class ListPage {
         url: 'http://moscutourgratis.com',
         port: '8069',
         db: 'Tour_Gratis_Rusia',
-        username: 'jose1914luis@gmail.com',
-        password: 'Tour2018',
+        username: '',
+        password: '',
     };
     cargar = true;
     mensaje = '';
@@ -28,7 +28,7 @@ export class ListPage {
     constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, public alertCtrl: AlertController, private network: Network) {
 
         var borrar = this.navParams.get('borrar');
-        //this.CONEXION.username = (this.navParams.get('login') == undefined)?'' : this.navParams.get('login');
+        this.CONEXION.username = (this.navParams.get('login') == undefined)? '' : this.navParams.get('login');
         if (borrar == true) {
             this.cargar = false;
             this.storage.remove('CONEXION');

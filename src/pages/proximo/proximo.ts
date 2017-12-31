@@ -57,8 +57,10 @@ export class ProximoPage {
                                                 var events = [];
                                                 for (var key in value) {
 
-                                                    var dateStart = new Date((value[key]).date_begin);
-                                                    var dateEnd = new Date((value[key]).date_end);
+                                                    //var dateStart = new Date((value[key]).date_begin);
+                                                    //var dateEnd = new Date((value[key]).date_end);
+                                                    var dateStart = new Date((value[key]).date_begin.replace(' ', 'T'));
+                                                    var dateEnd = new Date((value[key]).date_end.replace(' ', 'T'));//new Date((value[key]).date_end);
                                                     var startTime = new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate(), dateStart.getHours(), dateStart.getMinutes());
                                                     var endTime = new Date(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate(), dateEnd.getHours(), dateEnd.getMinutes());
                                                     for (var key2 in value2) {

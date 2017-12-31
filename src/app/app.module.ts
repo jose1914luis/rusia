@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { ErrorHandler, NgModule } from '@angular/core';
+import { enableProdMode, ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 
 import { MyApp } from './app.component';
@@ -25,8 +25,9 @@ import { Camera } from '@ionic-native/camera';
 import { Network } from '@ionic-native/network';
 import { PhotoViewer } from '@ionic-native/photo-viewer';
 import { Base64ToGallery } from '@ionic-native/base64-to-gallery';
+import { File } from '@ionic-native/file';
 //import { AndroidPermissions } from '@ionic-native/android-permissions';
-
+enableProdMode();
 @NgModule({
   declarations: [
     MyApp,
@@ -67,9 +68,9 @@ import { Base64ToGallery } from '@ionic-native/base64-to-gallery';
     CrearCuentaPage
   ],
   providers: [
-    Base64ToGallery, 
-    //AndroidPermissions,   
+    Base64ToGallery,  
     Camera,
+    File,
     Network,
     PhotoViewer,
     StatusBar,

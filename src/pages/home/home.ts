@@ -34,6 +34,7 @@ export class HomePage {
         //this.homeSinDatos();
         var self = this;
 
+        //console.log(this.network.type);
         if (this.network.type == 'unknown' || this.network.type == 'none') {// no hay conexion
             self.cargar = true;
             this.homeSinDatos();
@@ -47,7 +48,9 @@ export class HomePage {
                     var con = val;
                     var odoo = new OdooApi(PROXY, con.db);
                     odoo.login(con.username, con.password).then(
+
                         function (uid) {
+                            //console.log('entro' + uid);
                             //Si estoy conectado debo primero actualizar las solicitudes
                             self.storage.get('tours.eventos').then((val) => {
                                 //self.mensaje += '1';
@@ -109,13 +112,14 @@ export class HomePage {
                                                                             var eventsProx = [];
 
                                                                             for (var key in value) {
-                                                                                var dateStart = new Date((value[key]).date_begin);
-                                                                                var dateEnd = new Date((value[key]).date_end);
+                                                                                var dateStart = new Date((value[key]).date_begin.replace(' ', 'T'));
+                                                                                var dateEnd = new Date((value[key]).date_end.replace(' ', 'T'));//new Date((value[key]).date_end);
                                                                                 var startTime = new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate(), dateStart.getHours(), dateStart.getMinutes());
                                                                                 var endTime = new Date(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate(), dateEnd.getHours(), dateEnd.getMinutes());
-
+                                                                                //console.log(startTime);
                                                                                 for (var key2 in value2) {
                                                                                     if (value2[key2].id == (value[key]).tour_id[0]) {
+
                                                                                         var evento = {
                                                                                             title: (value2[key2]).name,
                                                                                             startTime: startTime,
@@ -146,6 +150,8 @@ export class HomePage {
                                                                             self.cargar = false;
                                                                             self.calendar.eventSource = events;
                                                                             self.storage.set('tours.eventos', events);
+                                                                            //console.log('calendario');
+                                                                            //console.log(JSON.stringify(self.calendar.eventSource));
                                                                         },
                                                                         function () {
                                                                             self.cargar = false;
@@ -264,9 +270,9 @@ export class HomePage {
             if (data) {
 
                 let eventData = data;
-                console.log(data.startTime);
+                //console.log(data.startTime);
                 eventData.startTime = new Date(data.startTime);
-                console.log(eventData.startTime);
+                //console.log(eventData.startTime);
                 eventData.endTime = new Date(data.endTime);
                 let events = this.calendar.eventSource;
                 events.push(eventData);

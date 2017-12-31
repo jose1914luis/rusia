@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {IonicPage, NavController, NavParams, AlertController} from 'ionic-angular';
+import {NavController, NavParams, AlertController} from 'ionic-angular';
 import {DomSanitizer} from '@angular/platform-browser';
 import {PromoDetailPage} from '../../pages/promo-detail/promo-detail';
 import {Storage} from '@ionic/storage';
@@ -7,7 +7,7 @@ import {ListPage} from '../../pages/list/list';
 import {PROXY} from '../../providers/constants/constants';
 
 declare var OdooApi: any;
-@IonicPage()
+//@IonicPage()
 @Component({
     selector: 'page-promocion',
     templateUrl: 'promocion.html',

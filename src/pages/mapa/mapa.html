@@ -20,10 +20,8 @@
 
   <div *ngIf="cargar" style="text-align: center">    
     <ion-spinner name="circles"></ion-spinner><br>
-    <b>Cargando Imagenes...</b>
+    <b>{{mensaje}}</b>
   </div>
-  
-  <div>{{mensaje}}</div>
   
   <ion-slides pager=true zoom="true">
     <ion-slide *ngFor="let item of items;">  
