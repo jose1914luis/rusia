@@ -30,11 +30,11 @@ export class HomePage {
     cargar = true;
     viewTitle = '';
     fecha = new Date();
+    hours = 0;
     constructor(private network: Network, public navCtrl: NavController, public modalCtrl: ModalController, private alertCtrl: AlertController, private storage: Storage) {
         //this.homeSinDatos();
         var self = this;
-
-        //console.log(this.network.type);
+        console.log(this.network.type);
         if (this.network.type == 'unknown' || this.network.type == 'none') {// no hay conexion
             self.cargar = true;
             this.homeSinDatos();
@@ -48,9 +48,7 @@ export class HomePage {
                     var con = val;
                     var odoo = new OdooApi(PROXY, con.db);
                     odoo.login(con.username, con.password).then(
-
                         function (uid) {
-                            //console.log('entro' + uid);
                             //Si estoy conectado debo primero actualizar las solicitudes
                             self.storage.get('tours.eventos').then((val) => {
                                 //self.mensaje += '1';
@@ -61,18 +59,42 @@ export class HomePage {
                                 self.storage.get('res.users').then((val) => {
                                     //self.mensaje += '2';
                                     let usuario = val;
+                                    //console.log(usuario);
                                     var inParams = [];
+                                    console.log(tabla_eventos_local);
+
+                                    //actualizo los datos en BD
                                     for (var key in tabla_eventos_local) {
+                                        console.log('interno 1');
+                                        console.log(tabla_eventos_local[key]);
+                                        (function(key){
+                                            console.log('interno 2');
+                                            console.log(tabla_eventos_local[key]);
+                                          if ((tabla_eventos_local[key]).estado == 'pendiente') {
+                                              console.log('interno 3');
+                                                console.log(tabla_eventos_local[key]);
 
-                                        if ((tabla_eventos_local[key]).estado == 'pendiente') {
-                                            inParams.push({
-                                                name: usuario.cliente_id,
-                                                tour_id: (tabla_eventos_local[key]).tour_id,
-                                                state: 'borrador',
-                                                num_person: (tabla_eventos_local[key]).num_person
-                                            });
-                                        }
+                                                odoo.create('tours.clientes.solicitudes', {
+                                                    name: usuario.cliente_id,
+                                                    tour_id: (tabla_eventos_local[key]).tour_id,
+                                                    state: 'borrador',
+                                                    num_person: (tabla_eventos_local[key]).num_person//Number.parseInt((tabla_eventos_local[key]).num_person)
+                                                }).then(
+                                                    function (value) {
 
+                                                        console.log('entro de una');
+                                                    },
+                                                    function () {
+                                                        console.log('error insertando los datos');
+                                                    }
+                                                );                                                                                           
+                                            }
+                                        })(key);
+                                                                                
+                                    }
+                                    
+                                    //agrego los eventos locales
+                                    for (var key in tabla_eventos_local) {
                                         if ((tabla_eventos_local[key]).home == true) {
                                             events.push({
                                                 title: (tabla_eventos_local[key]).title,
@@ -87,134 +109,152 @@ export class HomePage {
                                             });
                                         }
                                     }
-                                    //self.mensaje += '3';
+                                    
+
                                     var params = [];
                                     params.push(inParams);
                                     //self.mensaje += 'Parametros'+ JSON.stringify(inParams);
-                                    //console.log(inParams);
-                                    odoo.create('tours.clientes.solicitudes', inParams).then(
-                                        function (value_c) {
-                                            odoo.search_read('tours.clientes.solicitudes', [['id', '<>', '0']], ['id', 'name', 'tour_id', 'state', 'num_person']).then(
-                                                function (value_s) {
-                                                    //console.log(value_s);
-                                                    self.storage.remove('tours.guia');
-                                                    self.storage.get('tours.guia').then((val) => {
-                                                        
-                                                        //console.log(val);
-                                                        if (val == null) {
-                                                            //Traigo todos los eventos proximos                
-                                                            odoo.search_read('tours.guia', [['id', '<>', '0']], ['id', 'guia_id', 'tour_id', 'date_begin', 'date_end']).then(
+                                    console.log(inParams);
+                                   
+                                    odoo.search_read('tours.clientes.solicitudes', [['id', '<>', '0']], ['id', 'name', 'tour_id', 'state', 'num_person']).then(
+                                        function (value_s) {
+                                            //console.log(value_s);
+                                            self.storage.remove('tours.guia');
+                                            self.storage.get('tours.guia').then((val) => {
 
-                                                                function (value) {
-                                                                    //console.log(value);
-                                                                    odoo.search_read('tours', [['id', '<>', '0']], ['id', 'name', 'codigo', 'description', 'company_id']).then(
-                                                                        function (value2) {
-                                                                            var eventsProx = [];
+                                                //console.log(val);
+                                                if (val == null) {
+                                                    //Traigo todos los eventos proximos                
+                                                    odoo.search_read('tours.guia', [['id', '<>', '0']], ['id', 'guia_id', 'tour_id', 'date_begin', 'date_end']).then(
 
-                                                                            for (var key in value) {
-                                                                                var dateStart = new Date((value[key]).date_begin.replace(' ', 'T'));
-                                                                                var dateEnd = new Date((value[key]).date_end.replace(' ', 'T'));//new Date((value[key]).date_end);
-                                                                                var startTime = new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate(), dateStart.getHours(), dateStart.getMinutes());
-                                                                                var endTime = new Date(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate(), dateEnd.getHours(), dateEnd.getMinutes());
-                                                                                //console.log(startTime);
-                                                                                for (var key2 in value2) {
-                                                                                    if (value2[key2].id == (value[key]).tour_id[0]) {
+                                                        function (value) {
+                                                            //console.log(value);
+                                                            odoo.search_read('tours', [['id', '<>', '0']], ['id', 'name', 'codigo', 'description', 'company_id']).then(
+                                                                function (value2) {
+                                                                    var eventsProx = [];
+                                                                    var localdate = new Date();
+                                                                    self.hours = localdate.getTimezoneOffset()/60;
+                                                                    self.storage.set('hours', self.hours);
+                                                                    for (var key in value) {
 
-                                                                                        var evento = {
-                                                                                            title: (value2[key2]).name,
-                                                                                            startTime: startTime,
-                                                                                            endTime: endTime,
-                                                                                            allDay: false,
-                                                                                            description: (value2[key2]).description,
-                                                                                            guia: (value[key]).guia_id[1],
-                                                                                            ubicacion: (value2[key2]).company_id[1],
-                                                                                            estado: null,
-                                                                                            tour_id: value[key].id,
-                                                                                            home: false
-                                                                                        }
+                                                                        var dateS = new Date((value[key]).date_begin);
+                                                                        var dateE = new Date((value[key]).date_end);
+                                                                        var date_begin = new Date(dateS.getFullYear(), dateS.getMonth(), dateS.getDate(), dateS.getHours(), dateS.getMinutes());
+                                                                        var date_end = new Date(dateE.getFullYear(), dateE.getMonth(), dateE.getDate(), dateE.getHours(), dateE.getMinutes());                
+                                                                        
+                                                                        var dateStart = new Date((value[key]).date_begin).getTime();
+                                                                        var dateEnd = new Date((value[key]).date_end).getTime();
+                                                                        var startTime = new Date(dateStart- (self.hours*60*60*1000));
+                                                                        var endTime = new Date(dateEnd - (self.hours*60*60*1000));
 
-                                                                                        for (var key_s in value_s) {
-                                                                                            //console.log('for');
-                                                                                            if (value_s[key_s].tour_id[0] == value[key].id) {
-                                                                                                evento.estado = value_s[key_s].state;
-                                                                                                events.push(evento);
-                                                                                                break;
-                                                                                            }
-                                                                                        }
-                                                                                        eventsProx.push(evento);
+                                                                        for (var key2 in value2) {
+                                                                            if (value2[key2].id == (value[key]).tour_id[0]) {
+                                                                                var evento = {
+
+                                                                                    title: (value2[key2]).name,                                                                                            
+                                                                                    date_begin:date_begin,
+                                                                                    date_end:date_end,
+                                                                                    startTime: startTime,
+                                                                                    endTime: endTime,
+                                                                                    allDay: false,
+                                                                                    description: (value2[key2]).description,
+                                                                                    guia: (value[key]).guia_id[1],
+                                                                                    ubicacion: (value2[key2]).company_id[1],
+                                                                                    estado: null,
+                                                                                    tour_id: value[key].id,
+                                                                                    home: false
+                                                                                }
+
+                                                                                for (var key_s in value_s) {
+                                                                                    //console.log('for');
+                                                                                    if (value_s[key_s].tour_id[0] == value[key].id) {
+                                                                                        evento.estado = value_s[key_s].state;
+                                                                                        events.push(evento);
                                                                                         break;
                                                                                     }
                                                                                 }
+                                                                                eventsProx.push(evento);
+                                                                                break;
                                                                             }
-                                                                            self.storage.set('tours.guia', eventsProx); //si tiene eventos precargados
-                                                                            self.cargar = false;
-                                                                            self.calendar.eventSource = events;
-                                                                            self.storage.set('tours.eventos', events);
-                                                                            //console.log('calendario');
-                                                                            //console.log(JSON.stringify(self.calendar.eventSource));
-                                                                        },
-                                                                        function () {
-                                                                            self.cargar = false;
-                                                                            return self.homeSinDatos();
                                                                         }
-                                                                    );
+                                                                    }
+                                                                    self.storage.set('tours.guia', eventsProx); //si tiene eventos precargados
+                                                                    self.cargar = false;
+                                                                    self.calendar.eventSource = events;
+                                                                    self.storage.set('tours.eventos', events);
                                                                 },
                                                                 function () {
                                                                     self.cargar = false;
                                                                     return self.homeSinDatos();
                                                                 }
                                                             );
-                                                        } else {
-
-                                                            //console.log('se cargan en local');
-                                                            var eventsProx = [];
-
-                                                            for (var key in val) {
-
-                                                                var evento = {
-                                                                    title: (val[key]).title,
-                                                                    startTime: new Date((val[key]).startTime),
-                                                                    endTime: new Date((val[key]).endTime),
-                                                                    allDay: false,
-                                                                    description: (val[key]).description,
-                                                                    guia: (val[key]).guia,
-                                                                    ubicacion: (val[key]).ubicacion,
-                                                                    tour_id: (val[key]).tour_id,
-                                                                    estado: null,
-                                                                    home: false
-                                                                }
-                                                                for (var key_s in value_s) {
-                                                                    if (value_s[key_s].tour_id[0] == val[key].tour_id) {
-                                                                        evento.estado = value_s[key_s].state;
-                                                                        events.push(evento);
-                                                                        break;
-                                                                    }
-                                                                }
-                                                                eventsProx.push(evento);
-
-                                                            }
-
-
-                                                            //self.mensaje += 'entro por aca';
-                                                            self.storage.set('tours.guia', eventsProx); //si tiene eventos precargados
+                                                        },
+                                                        function () {
                                                             self.cargar = false;
-                                                            self.calendar.eventSource = events;
-                                                            self.storage.set('tours.eventos', events);
-                                                            //.log(events);
+                                                            return self.homeSinDatos();
                                                         }
-                                                    });
+                                                    );
+                                                } else {
 
-                                                },
-                                                function () {
+                                                    
+                                                    var eventsProx = [];
+                                                    var localdate = new Date();
+                                                    self.hours = localdate.getTimezoneOffset()/60;
+                                                    self.storage.get('hours').then((val) => {                                                                
+                                                        if(val != self.hours){
+                                                            self.storage.set('hours', self.hours);
+                                                        }                                                                
+                                                    });
+                                                   
+                                                    for (var key in val) {
+
+                                                        var dateStart = new Date((val[key]).date_begin).getTime();
+                                                        var dateEnd = new Date((val[key]).date_end).getTime();
+                                                        var startTime = new Date(dateStart- (self.hours*60*60*1000));
+                                                        var endTime = new Date(dateEnd - (self.hours*60*60*1000));
+
+                                                        var evento = {
+                                                            title: (val[key]).title,
+                                                            date_begin:new Date((val[key]).date_begin),
+                                                            date_end:new Date((val[key]).date_end),
+                                                            startTime: startTime,
+                                                            endTime: endTime,
+                                                            allDay: false,
+                                                            description: (val[key]).description,
+                                                            guia: (val[key]).guia,
+                                                            ubicacion: (val[key]).ubicacion,
+                                                            tour_id: (val[key]).tour_id,
+                                                            num_person: (val[key]).num_person,
+                                                            estado: null,
+                                                            home: false
+                                                        }
+                                                        for (var key_s in value_s) {
+                                                            if (value_s[key_s].tour_id[0] == val[key].tour_id) {
+                                                                evento.estado = value_s[key_s].state;
+                                                                events.push(evento);
+                                                                break;
+                                                            }
+                                                        }
+                                                        eventsProx.push(evento);
+
+                                                    }
+
+
+                                                    //self.mensaje += 'entro por aca';
+                                                    self.storage.set('tours.guia', eventsProx); //si tiene eventos precargados
                                                     self.cargar = false;
-                                                    return self.homeSinDatos();
+                                                    self.calendar.eventSource = events;
+                                                    self.storage.set('tours.eventos', events);
+                                                    //.log(events);
                                                 }
-                                            );
+                                            });
+
                                         },
                                         function () {
-                                            console.log('error creando tours.clientes.solicitudes');
+                                            self.cargar = false;
+                                            return self.homeSinDatos();
                                         }
-                                    );
+                                    );                                        
                                 });
                             });
                         },
@@ -229,26 +269,42 @@ export class HomePage {
 
     homeSinDatos() {
 
-
+        console.log('esta entrando en evento sin datos');
         var self = this;
+        var localdate = new Date();
+        self.hours = localdate.getTimezoneOffset()/60;
+        self.storage.get('hours').then((val) => {                                                                
+            if(val != self.hours){
+                self.storage.set('hours', self.hours);
+            }                                                                
+        });
         self.storage.get('tours.eventos').then((val) => {
 
             var events = [];
+            console.log(val);
 
             for (var key in val) {
+                console.log((val[key]).startTime);
+                var dateStart = new Date((val[key]).date_begin).getTime();
+                var dateEnd = new Date((val[key]).date_end).getTime();
+                var startTime = new Date(dateStart- (self.hours*60*60*1000));
+                var endTime = new Date(dateEnd - (self.hours*60*60*1000));
 
                 //self.mensaje += 'entro_ una';
                 events.push({
                     title: (val[key]).title,
-                    startTime: new Date((val[key]).startTime),
-                    endTime: new Date((val[key]).endTime),
+                    date_begin:new Date((val[key]).date_begin),
+                    date_end:new Date((val[key]).date_end),
+                    startTime: startTime,
+                    endTime: endTime,
                     allDay: false,
                     description: (val[key]).description,
                     guia: (val[key]).guia,
                     ubicacion: (val[key]).ubicacion,
                     tour_id: (val[key]).tour_id,
                     estado: val[key].estado,
-                    home: val[key].home
+                    home: val[key].home,
+                    num_person: (val[key]).num_person,
                 });
             }
 
@@ -270,9 +326,9 @@ export class HomePage {
             if (data) {
 
                 let eventData = data;
-                //console.log(data.startTime);
+                console.log(data.startTime);
                 eventData.startTime = new Date(data.startTime);
-                //console.log(eventData.startTime);
+                console.log(eventData.startTime);
                 eventData.endTime = new Date(data.endTime);
                 let events = this.calendar.eventSource;
                 events.push(eventData);
