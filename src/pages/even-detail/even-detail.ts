@@ -14,16 +14,25 @@ export class EvenDetailPage {
 
     mensaje = '';
     event_estado = '';
-    event_color = '';
+    event_color = '';//alejandro.lacquaniti@gmail.com
     nuevo = false;
     editable = true;
-    
-    event = {estado_bol: false, estado: null, title: '', startTime: null, num_person: 0, endTime: null, allDay: false, description: null, guia: null, ubicacion: null, home: false, tour_id: null}
+
+    event = { date_begin:null, date_end:null, estado_bol: false, estado: null, title: '', startTime: null, num_person: 0, endTime: null, allDay: false, description: null, guia: null, ubicacion: null, home: false, tour_id: null}
     constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, private alertCtrl: AlertController, private storage: Storage) {
         this.event.title = this.navParams.get('title');
-        this.event.startTime = this.navParams.get('startTime').toISOString();
-        this.event.endTime = this.navParams.get('endTime').toISOString();
+        var dateS = this.navParams.get('startTime');
+        var isoDateS = new Date(dateS.getTime() - (dateS.getTimezoneOffset() * 60000)).toISOString();
+        var dateE = this.navParams.get('endTime');
+        var isoDateE = new Date(dateE.getTime() - (dateE.getTimezoneOffset() * 60000)).toISOString();
+        
+        this.event.startTime = isoDateS;
+        this.event.endTime = isoDateE;
         this.event.description = this.navParams.get('description');
+        
+        this.event.date_begin = (this.navParams.get('date_begin') == undefined)?null: this.navParams.get('date_begin').toISOString();
+        this.event.date_end = (this.navParams.get('date_end') == undefined)?null: this.navParams.get('date_end').toISOString();//this.navParams.get('date_end').toISOString();
+        
         this.event.guia = this.navParams.get('guia');
         this.event.ubicacion = this.navParams.get('ubicacion');
         this.event.home = this.navParams.get('home');
@@ -140,7 +149,7 @@ export class EvenDetailPage {
                                             if (val == null) {
                                                 self.navCtrl.setRoot(ListPage, {borrar: true, login: null});
                                             } else {
-                                                console.log(val.cliente_id);
+                                                //console.log({name: val.cliente_id, tour_id: self.event.tour_id, state: 'borrador', num_person: data.num_person});
                                                 odoo.create('tours.clientes.solicitudes', {name: val.cliente_id, tour_id: self.event.tour_id, state: 'borrador', num_person: data.num_person}).then(
                                                     function (value) {
 
