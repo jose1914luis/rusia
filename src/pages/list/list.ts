@@ -94,7 +94,7 @@ export class ListPage {
                     function (uid) {
 
 
-                        odoo.search_read('res.users', [['login', '=', 'jose1914luis@gmail.com']], ['id', 'login', 'user_email', 'image', 'name']).then(
+                        odoo.search_read('res.users', [['login', '=', con.username]], ['id', 'login', 'user_email', 'image', 'name']).then(
                             function (value) {
 
                                 var user = {id: null, name: null, image: null, login: null, cliente_id: null};
