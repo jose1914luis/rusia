@@ -143,25 +143,27 @@ export class HomePage {
                                                                         var endTime = new Date(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate(), dateEnd.getHours(), dateEnd.getMinutes());*/
                                                                         let valB = (value[key]).date_begin.replace(' ', 'T');
                                                                         let valE = (value[key]).date_end.replace(' ', 'T');        
-                                                                        var dateS = new Date(valB);
-                                                                        var dateE = new Date(valE);
-                                                                        console.log((value[key]).date_begin);
-                                                                        console.log(dateS);
-                                                                        var date_begin = new Date(dateS.getFullYear(), dateS.getMonth(), dateS.getDate(), dateS.getHours(), dateS.getMinutes());
-                                                                        var date_end = new Date(dateE.getFullYear(), dateE.getMonth(), dateE.getDate(), dateE.getHours(), dateE.getMinutes());                
-                                                                        
-                                                                        var dateStart = new Date(valB).getTime();
-                                                                        var dateEnd = new Date(valE).getTime();
-                                                                        var startTime = new Date(dateStart- (self.hours*60*60*1000));
-                                                                        var endTime = new Date(dateEnd - (self.hours*60*60*1000));
+                                                                        //var dateS = new Date(valB);
+                                                                        //var dateE = new Date(valE);
+                                                                        //console.log((value[key]).date_begin);
+                                                                        //console.log(dateS);
+                                                                        //var date_begin = new Date(dateS.getFullYear(), dateS.getMonth(), dateS.getDate(), dateS.getHours(), dateS.getMinutes());
+                                                                        //var date_end = new Date(dateE.getFullYear(), dateE.getMonth(), dateE.getDate(), dateE.getHours(), dateE.getMinutes());                
+
+                                                                        //var dateStart = new Date(valB).getTime();
+                                                                        //var dateEnd = new Date(valE).getTime();
+                                                                        var startTime = new Date(valB);
+                                                                        var endTime = new Date(valE);
+                                                                        //var startTime = new Date(dateStart- (self.hours*60*60*1000));
+                                                                        //var endTime = new Date(dateEnd - (self.hours*60*60*1000));
 
                                                                         for (var key2 in value2) {
                                                                             if (value2[key2].id == (value[key]).tour_id[0]) {
                                                                                 var evento = {
 
                                                                                     title: (value2[key2]).name,                                                                                            
-                                                                                    date_begin:date_begin,
-                                                                                    date_end:date_end,
+                                                                                    date_begin:valB,
+                                                                                    date_end:valE,
                                                                                     startTime: startTime,
                                                                                     endTime: endTime,
                                                                                     allDay: false,

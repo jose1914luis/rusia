@@ -129,10 +129,10 @@ export class ProximoPage {
                         });
                         for (var key in val) {
 
-                            var dateStart = new Date((val[key]).date_begin).getTime();
-                            var dateEnd = new Date((val[key]).date_end).getTime();
-                            var startTime = new Date(dateStart- (self.hours*60*60*1000));
-                            var endTime = new Date(dateEnd - (self.hours*60*60*1000));
+                            //var dateStart = new Date((val[key]).date_begin).getTime();
+                            //var dateEnd = new Date((val[key]).date_end).getTime();
+                            //var startTime = new Date(dateStart- (self.hours*60*60*1000));
+                            //var endTime = new Date(dateEnd - (self.hours*60*60*1000));
 
                             events.push({
                                 title: (val[key]).title,
