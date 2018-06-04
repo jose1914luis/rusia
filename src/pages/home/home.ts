@@ -128,7 +128,7 @@ export class HomePage {
                                                     odoo.search_read('tours.guia', [['id', '<>', '0']], ['id', 'guia_id', 'tour_id', 'date_begin', 'date_end']).then(
 
                                                         function (value) {
-                                                            //console.log(value);
+                                                            console.log(JSON.stringify(value));
                                                             odoo.search_read('tours', [['id', '<>', '0']], ['id', 'name', 'codigo', 'description', 'company_id']).then(
                                                                 function (value2) {
                                                                     var eventsProx = [];
@@ -137,13 +137,21 @@ export class HomePage {
                                                                     self.storage.set('hours', self.hours);
                                                                     for (var key in value) {
 
-                                                                        var dateS = new Date((value[key]).date_begin);
-                                                                        var dateE = new Date((value[key]).date_end);
+                                                                        /*var dateStart = new Date((value[key]).date_begin.replace(' ', 'T'));
+                                                                        var dateEnd = new Date((value[key]).date_end.replace(' ', 'T'));//new Date((value[key]).date_end);
+                                                                        var startTime = new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate(), dateStart.getHours(), dateStart.getMinutes());
+                                                                        var endTime = new Date(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate(), dateEnd.getHours(), dateEnd.getMinutes());*/
+                                                                        let valB = (value[key]).date_begin.replace(' ', 'T');
+                                                                        let valE = (value[key]).date_end.replace(' ', 'T');        
+                                                                        var dateS = new Date(valB);
+                                                                        var dateE = new Date(valE);
+                                                                        console.log((value[key]).date_begin);
+                                                                        console.log(dateS);
                                                                         var date_begin = new Date(dateS.getFullYear(), dateS.getMonth(), dateS.getDate(), dateS.getHours(), dateS.getMinutes());
                                                                         var date_end = new Date(dateE.getFullYear(), dateE.getMonth(), dateE.getDate(), dateE.getHours(), dateE.getMinutes());                
                                                                         
-                                                                        var dateStart = new Date((value[key]).date_begin).getTime();
-                                                                        var dateEnd = new Date((value[key]).date_end).getTime();
+                                                                        var dateStart = new Date(valB).getTime();
+                                                                        var dateEnd = new Date(valE).getTime();
                                                                         var startTime = new Date(dateStart- (self.hours*60*60*1000));
                                                                         var endTime = new Date(dateEnd - (self.hours*60*60*1000));
 

@@ -100,8 +100,11 @@
     <plugin name="cordova-plugin-wkwebview-engine" spec="^1.1.4" />
     <allow-navigation href="http://192.168.1.18:8101" />
     <plugin name="cordova-plugin-file" spec="^5.0.0" />
-    <engine name="ios" spec="4.5.4" />
-    <engine name="android" spec="~7.0.0" />
     <allow-navigation href="http://192.168.1.12:8100" />
     <allow-navigation href="http://192.168.1.197:8100" />
+    <allow-navigation href="http://192.168.1.16:8100" />
+    <allow-navigation href="http://192.168.1.16:8101" />
+    <allow-navigation href="http://192.168.1.16:8102" />
+    <engine name="android" spec="7.0.0" />
+    <engine name="ios" spec="4.5.4" />
 </widget>
